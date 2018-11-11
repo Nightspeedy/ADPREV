@@ -3,22 +3,18 @@ const fs = require('fs');
 const Discord = require('discord.js');
 
 module.exports.run = async(bot, message, args) => {
+    
+    if (message.author.id == 365452203982323712){
 
-    let settings = new Discord.RichEmbed()
-    .setColor(getRandomColor())
-    .setTitle("Settings")
-    .addBlankField(true)
-    .addField("Command prefix", guildSettings[message.guild.id].prefix)
-    .addField("Join/leave channel", guildSettings[message.guild.id].channel)
-    .addField("Ban offenders", guildSettings[message.guild.id].ban)
-    .addField("Action messages", guildSettings[message.guild.id].actionMessage)
+        if (!args[0]) return message.reply()
 
-    message.channel.send(settings).then(message);
+    } else {
+        return message.channel.send("**Error!** You do not have permission to execute this command!");
+    }
 
 }
-
 module.exports.help = {
-    name: "settings"
+    name: "premium"
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

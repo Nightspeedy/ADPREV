@@ -3,26 +3,33 @@ const fs = require('fs');
 const Discord = require('discord.js');
 
 module.exports.run = async(bot, message, args) => {
-    
-    if (message.member.hasPermission("ADMINISTRATOR")) {
 
+    if (message.member.hasPermission("ADMINISTRATOR")) {
+    
         if (!args[0]) return message.channel.send("**Error!** Please use at least 1 argument!");
         if (args[1]) return message.channel.send("**Error!** Too many arguments. 1 expected, got " + args.length);
-        if (!message.mentions.channels.first()) return message.channel.send("**Error!** Expected argument is not a channel!");
 
-        guildSettings[message.guild.id].channel = message.mentions.channels.first().name;
+        if (args[0] == "true") {
 
-        message.channel.send("Channel set to: " + args[0]);
+            guildSettings[message.guild.id].actionMessage = true;
+            message.channel.send("Now sending action logs!");
 
-        save();
+        } else if (args[0] == "false") {
+
+            guildSettings[message.guild.id].actionMessage = false;
+            message.channel.send("Now hiding action logs!");
+
+        } else {
+            message.channel.send("**Error!** Expected argument 'true' or 'false' but got: " + args[0]);
+        }
 
     } else {
-        message.channel.send("You do not have permission to execute this command!");
+        message.channel.send("**Error!** You do not have permission to execute this command!");            
     }
 
 }
 module.exports.help = {
-    name: "set-channel"
+    name: "set-actionlog"
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

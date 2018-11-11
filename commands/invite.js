@@ -3,22 +3,13 @@ const fs = require('fs');
 const Discord = require('discord.js');
 
 module.exports.run = async(bot, message, args) => {
+    
+   message.channel.send("I am a public bot! Invite me to your own server using this link: \n https://discordapp.com/api/oauth2/authorize?client_id=503687810885353472&permissions=8&scope=bot");
 
-    let settings = new Discord.RichEmbed()
-    .setColor(getRandomColor())
-    .setTitle("Settings")
-    .addBlankField(true)
-    .addField("Command prefix", guildSettings[message.guild.id].prefix)
-    .addField("Join/leave channel", guildSettings[message.guild.id].channel)
-    .addField("Ban offenders", guildSettings[message.guild.id].ban)
-    .addField("Action messages", guildSettings[message.guild.id].actionMessage)
-
-    message.channel.send(settings).then(message);
 
 }
-
 module.exports.help = {
-    name: "settings"
+    name: "invite"
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

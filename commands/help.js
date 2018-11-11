@@ -1,5 +1,6 @@
-const bot = require("discord.js");
-const guildSettings = require("./guildsettings.json");
+const guildSettings = require('./../guildSettings.json');
+const fs = require('fs');
+const Discord = require('discord.js');
 
 module.exports.run = async(bot, message, args) => {
 
@@ -23,6 +24,21 @@ module.exports.run = async(bot, message, args) => {
 }
 
 module.exports.help = {
-    name: "Help",
-    description: "Command help",
+    name: "help"
+}
+
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+function getRandomColor() {
+    let letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+function save(){
+    fs.writeFile("./guildSettings.json", JSON.stringify(guildSettings), (err) => {
+        if (err) console.log(err);
+    });
 }

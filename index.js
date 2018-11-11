@@ -14,7 +14,7 @@ fs.readdir("./commands/", (err, files) => {
 
     if(err) console.log(err);
 
-    let jsfile = files.filter(f => f.split('.').pop() === "js");
+    let jsfile = files.filter(f => f.split(".").pop() === "js");
     if (jsfile.length <= 0) {
         return console.log("FATAL! Error loading commands!");
     }
@@ -22,7 +22,10 @@ fs.readdir("./commands/", (err, files) => {
     
     files.forEach((f, i) => {
 
-        console.log()
+        let props = require(`./commands/${f}`);
+
+        console.log(`command ${f} loaded!`);
+        bot.commands.set(props.help.name, props)
 
     });
 
@@ -49,6 +52,8 @@ bot.on('ready', async() => {
 
             setBotActivity = `Mention me!`;
 
+            
+
         }
 
 		bot.user.setActivity(setBotActivity, {type: "WATCHING"});
@@ -56,8 +61,34 @@ bot.on('ready', async() => {
 
     }, 60000)
 
+
     bot.user.setActivity(setBotActivity, {type: "WATCHING"});
     console.log("Logged in on " + guildSize + " guilds!")
+
+    let keyArray = bot.guilds.keyArray();
+
+    for (i = 0; i < keyArray.length; i++) {
+        
+        if (!guildSettings[keyArray[i]]) {
+
+            guildSettings[keyArray[i]] = {
+
+                prefix: '!!',
+                channel: 'none',
+                ban: false,
+                actionMessage: true,
+                isPremium: false,
+                banMessage: "An advertising bot has been banned!",
+
+        
+
+            }
+            console.log("Created object for: " + keyArray[i])
+            fs.writeFile("./guildSettings.json", JSON.stringify(guildSettings), (err) => {
+                if (err) console.log(err);
+            });
+        }
+    }   
 
 });
 
@@ -82,6 +113,9 @@ bot.on('guildCreate', (guild) => {
 
     }
 
+});
+bot.on('guildDelete', (guild) => {
+    //do something with this soon
 });
 
 bot.on('guildMemberAdd', (member) => {
@@ -152,208 +186,10 @@ bot.on('message', (message) => {
     // Check if channel type is DM
     if (message.channel.type == "dm") return;
 
-    //SET PREFIX
-    //SET PREFIX
-    //SET PREFIX
-    if (command == "set-prefix" && message.content.startsWith(prefix)) {
-        if (message.member.hasPermission("ADMINISTRATOR")) {
-
-            if (!args[0]) return message.channel.send("**Error!** Please use at least 1 argument!");
-            if (args[1]) return message.channel.send("**Error!** Too many arguments. 1 expected, got " + args.length);
+    let commandFile = bot.commands.get(command);
+    if (commandFile) commandFile.run(bot, message, args);
 
 
-            guildSettings[message.guild.id].prefix = args[0];
-
-            message.channel.send("Server prefix set to: " + args[0]);
-
-            save();
-
-        } else {
-            message.channel.send("You do not have permission to execute this command!");
-        }
-    }
-
-    //SET CHANNEL
-    //SET CHANNEL
-    //SET CHANNEL
-    if (command == "set-channel" && message.content.startsWith(prefix)) {
-        if (message.member.hasPermission("ADMINISTRATOR")) {
-
-            if (!args[0]) return message.channel.send("**Error!** Please use at least 1 argument!");
-            if (args[1]) return message.channel.send("**Error!** Too many arguments. 1 expected, got " + args.length);
-            if (!message.mentions.channels.first()) return message.channel.send("**Error!** Expected argument is not a channel!");
-
-            guildSettings[message.guild.id].channel = message.mentions.channels.first().name;
-
-            message.channel.send("Channel set to: " + args[0]);
-
-            save();
-
-        } else {
-            message.channel.send("You do not have permission to execute this command!");
-        }
-    }
-
-    //SET BAN
-    //SET BAN
-    //SET BAN
-    if (command == "set-ban" && message.content.startsWith(prefix)) {
-        if (message.member.hasPermission("ADMINISTRATOR")) {
-        
-            if (!args[0]) return message.channel.send("**Error!** Please use at least 1 argument!");
-            if (args[1]) return message.channel.send("**Error!** Too many arguments. 1 expected, got " + args.length);
-
-            if (args[0] == "true") {
-
-                guildSettings[message.guild.id].ban = true;
-                message.channel.send("Now banning join/leave advertisements!");
-
-                save();
-
-            } else if (args[0] == "false") {
-
-                guildSettings[message.guild.id].ban = false;
-                message.channel.send("Now kicking join/leave advertisements!");
-
-                save();
-
-            } else {
-                message.channel.send("**Error!** Expected argument 'true' or 'false' but got: " + args[0]);
-            }
-
-        } else {
-            message.channel.send("You do not have permission to execute this command!");            
-        }
-    }
-
-    //SET ACTIONLOG
-    //SET ACTIONLOG
-    //SET ACTIONLOG
-    if (command == "set-actionlog" && message.content.startsWith(prefix)) {
-        if (message.member.hasPermission("ADMINISTRATOR")) {
-        
-            if (!args[0]) return message.channel.send("**Error!** Please use at least 1 argument!");
-            if (args[1]) return message.channel.send("**Error!** Too many arguments. 1 expected, got " + args.length);
-
-            if (args[0] == "true") {
-
-                guildSettings[message.guild.id].actionMessage = true;
-                message.channel.send("Now sending action logs!");
-
-            } else if (args[0] == "false") {
-
-                guildSettings[message.guild.id].actionMessage = false;
-                message.channel.send("Now hiding action logs!");
-
-            } else {
-                message.channel.send("**Error!** Expected argument 'true' or 'false' but got: " + args[0]);
-            }
-
-        } else {
-            message.channel.send("**Error!** You do not have permission to execute this command!");            
-        }
-    }
-
-    //SET MESSAGE
-    //SET MESSAGE
-    //SET MESSAGE
-    if (command == "set-message" && message.content.startsWith(prefix)) {
-        if (message.member.hasPermission("ADMINISTRATOR")) {
-            if (guildSettings[message.guild.id].isPremium == true) {
-
-                guildSettings[message.guild.id].banMessage = message.content.slice(prefix.length + command.length + 1);
-                message.channel.send("Banmessage set to '" + guildSettings[message.guild.id].banMessage + "'");
-
-            } else {
-                message.channel.send("**Error!** You do not have ADPREV-Premium!");
-            }
-
-        } else {
-            message.channel.send("**Error!** You do not have permission to execute this command!");            
-        }
-    }
-
-    //SETTINGS
-    //SETTINGS
-    //SETTINGS
-    if (command == "settings" && message.content.startsWith(prefix)){
-
-        let settings = new Discord.RichEmbed()
-        .setColor(getRandomColor())
-        .setTitle("Settings")
-        .addBlankField(true)
-        .addField("Command prefix", guildSettings[message.guild.id].prefix)
-        .addField("Join/leave channel", guildSettings[message.guild.id].channel)
-        .addField("Ban offenders", guildSettings[message.guild.id].ban)
-        .addField("Action messages", guildSettings[message.guild.id].actionMessage)
-
-        message.channel.send(settings).then(message);
-
-    }
-    //INVITE
-    //INVITE
-    //INVITE
-    if (command == "invite" && message.content.startsWith(prefix)){
-
-        message.channel.send("I am a public bot! Invite me to your own server using this link: \n https://discordapp.com/api/oauth2/authorize?client_id=503687810885353472&permissions=8&scope=bot");
-
-    }
-
-    //GLOBAL MESSAGE
-    //GLOBAL MESSAGE
-    //GLOBAL MESSAGE
-    if (command == "global-message" && message.content.startsWith(prefix)){
-
-        if (message.author.id == 365452203982323712) {
-
-            let messageToSend = message.content.slice(command.length + 3);
-            let servers = Object.keys(guildSettings);
-            for (o = 0; o < servers.length; o++){
-
-                let curServer = bot.guilds.get(servers[o]);
-                //let curChannel = bot.curServer.channels.find('name', guildSettings[servers[o]].channel);
-
-                console.log(o);
-
-                if (guildSettings[servers[o]].channel == 'none' || guildSettings[servers[o]].channel == undefined) {
-
-                    curServer.channels.filter(channel => channel.type == "text").random().send(messageToSend).catch(err => console.log(err));
-
-                } else {
-
-                    curServer.channels.find('name', guildSettings[servers[o]].channel).send(messageToSend);
-                    
-                }
-
-                if (o == servers.length){
-
-                    message.channel.send("Message sent to all servers!");
-
-                }
-
-            }
-            message.channel.send("Message '" + messageToSend + "' sent across all servers!")
-        } else {
-            message.channel.send(errorCode(1));
-        }
-    }
-
-    //FETCHINVITE
-    //FETCHINVITE
-    //FETCHINVITE
-    if(command == "fetchinvite" && message.content.startsWith(prefix)) {
-
-        if (message.author.id == 365452203982323712){
-
-        } else {
-            return message.channel.send("**Error!** You do not have permission to execute this command!");
-        }
-
-    }
-
-    //HELP
-    //HELP
-    //HELP
     if (message.mentions.members.first()) {
 
         let checkMention = String(message.mentions.members.first().user.username);
@@ -365,28 +201,6 @@ bot.on('message', (message) => {
             return;
         }
     }
-
-    if (command == "help" && message.content.startsWith(prefix)) {
-
-        let embed = new Discord.RichEmbed()
-        .setColor(getRandomColor())
-        .setTitle("ADPREV Command Help")
-        .addField("What is ADPREV?", "ADPREV is a bot developed by Asuna#1000. ADPREV is a configurable bot that bans/kicks any user that has a link in their username to advertise their social platforms, and deletes any welcoming messages.")
-        .addBlankField(true)
-        .addField("User with a link not kicked/banned and no message was deleted?", "Please contact Asuna#1000 and send her the link this user had in their username, the domain is probbably not registered within ADPREV's database yet.")
-        .addBlankField(true)
-        .addField(guildSettings[message.guild.id].prefix + "set-prefix [prefix]", "Set the command prefix.")
-        .addField(guildSettings[message.guild.id].prefix + "set-channel [channel]", "Set your join/leave message channel.")
-        .addField(guildSettings[message.guild.id].prefix + "set-ban [true/false]", "Toggle banning on or off.")
-        .addField(guildSettings[message.guild.id].prefix + "set-message [true/false]", "Toggle action messages on or off.")
-        .addField(guildSettings[message.guild.id].prefix + "settings", "See all your current settings.")
-        .addField(guildSettings[message.guild.id].prefix + "invite", "Get the bot invite link to add it to your own server.")
-        .addBlankField(true)
-        .addField("Support", "For additional help, contact Asuna#1000");
-
-        message.channel.send(embed)
-    }
-
 });
 
 bot.on('error', console.error);
@@ -472,4 +286,4 @@ setInterval(function(){
     
 }, 36000000);
 
-bot.login(botconfig.token);
+bot.login(botconfig.token2);

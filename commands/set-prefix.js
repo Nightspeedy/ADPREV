@@ -3,22 +3,26 @@ const fs = require('fs');
 const Discord = require('discord.js');
 
 module.exports.run = async(bot, message, args) => {
+        if (message.member.hasPermission("ADMINISTRATOR")) {
 
-    let settings = new Discord.RichEmbed()
-    .setColor(getRandomColor())
-    .setTitle("Settings")
-    .addBlankField(true)
-    .addField("Command prefix", guildSettings[message.guild.id].prefix)
-    .addField("Join/leave channel", guildSettings[message.guild.id].channel)
-    .addField("Ban offenders", guildSettings[message.guild.id].ban)
-    .addField("Action messages", guildSettings[message.guild.id].actionMessage)
+        if (!args[0]) return message.channel.send("**Error!** Please use at least 1 argument!");
+        if (args[1]) return message.channel.send("**Error!** Too many arguments. 1 expected, got " + args.length);
 
-    message.channel.send(settings).then(message);
 
+        guildSettings[message.guild.id].prefix = args[0];
+
+        message.channel.send("Server prefix set to: " + args[0]);
+
+        save();
+
+        } else {
+            message.channel.send("You do not have permission to execute this command!");
+        }
+    
 }
 
 module.exports.help = {
-    name: "settings"
+    name: "set-prefix"
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
