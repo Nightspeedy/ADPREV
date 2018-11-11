@@ -4,9 +4,11 @@ const Discord = require('discord.js');
 
 module.exports.run = async(bot, message, args) => {
 
+    const command = args.shift();
+
     if (message.author.id == 365452203982323712) {
 
-        let messageToSend = message.content.slice(command.length + 3);
+        let messageToSend = message.content.slice(command.length + 12);
         let servers = Object.keys(guildSettings);
         for (o = 0; o < servers.length; o++){
 
@@ -23,12 +25,6 @@ module.exports.run = async(bot, message, args) => {
 
                 curServer.channels.find('name', guildSettings[servers[o]].channel).send(messageToSend);
                 
-            }
-
-            if (o == servers.length){
-
-                message.channel.send("Message sent to all servers!");
-
             }
 
         }

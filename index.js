@@ -187,7 +187,7 @@ bot.on('message', (message) => {
     if (message.channel.type == "dm") return;
 
     let commandFile = bot.commands.get(command);
-    if (commandFile) commandFile.run(bot, message, args);
+    if (commandFile && message.content.startsWith(prefix)) commandFile.run(bot, message, args);
 
 
     if (message.mentions.members.first()) {
@@ -286,4 +286,4 @@ setInterval(function(){
     
 }, 36000000);
 
-bot.login(botconfig.token2);
+bot.login(botconfig.token);
