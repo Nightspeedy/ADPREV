@@ -1,40 +1,53 @@
 const commando = require('discord.js-commando');
 const Discord = require('discord.js');
-const bot = new commando.Client({
-    disableEveryone: true,
+const bot = new Discord.Client({
     unknownCommandResponse: false
 });
+bot.commands = new Discord.Collection();
 const botconfig = require('./botconfig.json');
-const sao = require('./sao.json');
-const alo = require('./alo.json');
-const ggo = require('./ggo.json');
+const guildSettings = require('./guildSettings.json');
 const fs = require('fs');
-const commandList = ["help", "fight", "hi", "check", "roadmap"];
+
+console.log("Starting bot...");
+
+fs.readdir("./commands/", (err, files) => {
+
+    if(err) console.log(err);
+
+    let jsfile = files.filter(f => f.split('.').pop() === "js");
+    if (jsfile.length <= 0) {
+        return console.log("FATAL! Error loading commands!");
+    }
+    console.log(jsfile);
+    
+    files.forEach((f, i) => {
+
+        console.log()
+
+    });
+
+});
 
 bot.on('ready', async() => {
 
-    var setBotActivity;
-
-    bot.user.setActivity(setBotActivity);
     console.log(`${bot.user.username} Login succesfull!`);
+
+    let setBotActivity = `Mention me!`;
+    let guildSize = `${bot.guilds.size}`;
 
     setInterval(function(){
 		
         if (setBotActivity == undefined) {
 
-            setBotActivity = "Developing! Yui-help";
+            setBotActivity = `Mention me!`;
 
-        } else if (setBotActivity == "Developing! Yui-help") {
+        } else if (setBotActivity == `Mention me!`) {
 
-            setBotActivity = "I love mama!";
-
-        } else if (setBotActivity == "I love mama!") {
-
-            setBotActivity = "I love papa!";
+            setBotActivity = `over ${bot.guilds.size} guilds!`;
 
         } else {
 
-            setBotActivity = "Developing! Yui-help";
+            setBotActivity = `Mention me!`;
 
         }
         
@@ -43,12 +56,94 @@ bot.on('ready', async() => {
 
     }, 60000)
 
+    bot.user.setActivity(setBotActivity, {type: "WATCHING"});
+    console.log("Logged in on " + guildSize + " guilds!")
+
+});
+
+bot.on('guildCreate', (guild) => {
+
+    if (!guildSettings[guild.id]) {
+
+        guildSettings[guild.id] = {
+
+            prefix: '!!',
+            channel: 'none',
+            ban: false,
+            actionMessage: true,
+            isPremium: false,
+            banMessage: "An advertising bot has been banned!",
+
+        }
+
+        fs.writeFile("./guildSettings.json", JSON.stringify(guildSettings), (err) => {
+            if (err) console.log(err);
+        });
+
+    }
+
+});
+
+bot.on('guildMemberAdd', (member) => {
+
+    let getMemberName = String(member.user.username);
+    
+    runCheck(member, getMemberName);
+
 });
 
 bot.on('message', (message) => {
+
+    if (!guildSettings[message.guild.id]) {
+
+        guildSettings[message.guild.id] = {
+
+            prefix: '!!',
+            channel: 'none',
+            ban: false,
+            actionMessage: true,
+            isPremium: false,
+            banMessage: "An advertising bot has been banned!",
+
+        }
+
+        fs.writeFile("./guildSettings.json", JSON.stringify(guildSettings), (err) => {
+            if (err) console.log(err);
+        });
+
+        message.channel.send("Whoah! Something went wrong! Please re-configure me to your needs, Use " + guildSettings[message.guild.id].prefix + "help to get a list of my commands!" );
+
+        return;
+    }
+
+
+    let channel = bot.channels.find('name', guildSettings[message.guild.id].channel);
+    if (message.author.id == 503687810885353472){
+        return;
+    }
+
+    if (message.channel == channel && guildSettings[message.guild.id].channel != 'none' && message.author.bot ) {
+
+        let mentioned = "null";
+
+        if (message.mentions.members.first()) {
+
+            mentioned = String(message.mentions.members.first().user.username);
+
+        }
+        for (i = 0; i <= botconfig.bannedTags.length; i++){
+
+            if (message.content.includes(botconfig.bannedTags[i]) || mentioned.includes(botconfig.bannedTags[i])){
+                
+                message.delete();
+                console.log("Message deleted!");
+
+                return;
+            }
+        }
+    }
     
-    const prefix = botconfig.prefix;
-    const getChannel = message.content;
+    const prefix = guildSettings[message.guild.id].prefix;
 	const args = message.content.slice(prefix.length).trim().split(/ +/g);
     const command = args.shift();
 
@@ -57,345 +152,338 @@ bot.on('message', (message) => {
     // Check if channel type is DM
     if (message.channel.type == "dm") return;
 
-    if (command == "help" && message.content.startsWith(prefix)) {
+    //SET PREFIX
+    //SET PREFIX
+    //SET PREFIX
+    if (command == "set-prefix" && message.content.startsWith(prefix)) {
+        if (message.member.hasPermission("ADMINISTRATOR")) {
 
-        let helpEmbed = new Discord.RichEmbed()
-        .setColor(getRandomColor())
-        .setTitle("Yui Command Help")
-        .addBlankField(true)
-        .addField("Global commands", "These commands can be used anywhere")
-        .addField("Command list", "\nYui-hi - say hello to Yui \n Yui-")
-        .addBlankField(true)
-        .addField("Sword Art Online", "These commands only work in the SAO roleplay!")
-        .addField("Command list", "Yui-fight list")
+            if (!args[0]) return message.channel.send("**Error!** Please use at least 1 argument!");
+            if (args[1]) return message.channel.send("**Error!** Too many arguments. 1 expected, got " + args.length);
 
-        message.channel.send(helpEmbed);
 
-        message.reply("Work In Progress! If you need any help with my commands, ask WannaBeGamerGirl directly please!");
+            guildSettings[message.guild.id].prefix = args[0];
 
-        return;
-    }
-    if (message.content.includes("hi") && message.content.includes("yui", "Yui")) {
+            message.channel.send("Server prefix set to: " + args[0]);
 
-        var answers = ["Hello!", "Hi there!", "Hey!", "Good day :D", "Greetings!"];
-        var papaAnswers = ["Hello papa!", "Hi there papa!", "Hey papa!", "Good day papa!", "Greetings papa!"];
-        var mamaAnswers = ["Hello mama!", "Hi there mama!", "Hey mama!", "Good day mama!", "Greetings mama!"];
-        var answerIndex = Math.floor(Math.random() * answers.length);
-        var papaIndex = Math.floor(Math.random() * papaAnswers.length);
-        var mamaIndex = Math.floor(Math.random() * mamaAnswers.length);
+            save();
 
-        if (message.author.id == "399494016539820032") {
-
-            message.reply(papaAnswers[papaIndex]);
-
-            return;
+        } else {
+            message.channel.send("You do not have permission to execute this command!");
         }
-		else if (message.author.id == "365452203982323712") {
-
-            message.reply(mamaAnswers[mamaIndex]);
-
-            return
-        }
-		else {
-
-            message.reply(answers[answerIndex]);
-
-            return;
-        }
-        return;
     }
 
-    if (command == "save" && message.member.hasPermission("ADMINISTRATOR") && message.content.startsWith(prefix)) {
+    //SET CHANNEL
+    //SET CHANNEL
+    //SET CHANNEL
+    if (command == "set-channel" && message.content.startsWith(prefix)) {
+        if (message.member.hasPermission("ADMINISTRATOR")) {
+
+            if (!args[0]) return message.channel.send("**Error!** Please use at least 1 argument!");
+            if (args[1]) return message.channel.send("**Error!** Too many arguments. 1 expected, got " + args.length);
+            if (!message.mentions.channels.first()) return message.channel.send("**Error!** Expected argument is not a channel!");
+
+            guildSettings[message.guild.id].channel = message.mentions.channels.first().name;
+
+            message.channel.send("Channel set to: " + args[0]);
+
+            save();
+
+        } else {
+            message.channel.send("You do not have permission to execute this command!");
+        }
+    }
+
+    //SET BAN
+    //SET BAN
+    //SET BAN
+    if (command == "set-ban" && message.content.startsWith(prefix)) {
+        if (message.member.hasPermission("ADMINISTRATOR")) {
         
-        fs.writeFile("./sao.json", JSON.stringify(sao), (err) => {
-            if (err) console.log(err);            
-        });
-		
-        fs.writeFile("./alo.json", JSON.stringify(alo), (err) => {
-            if (err) console.log(err);         
-        });
-		
-        fs.writeFile("./ggo.json", JSON.stringify(ggo), (err) => {
-            if (err) console.log(err);
-        });
-		
-        fs.writeFile("./botconfig.json", JSON.stringify(botconfig), (err) => {
-            if (err) console.log(err);
-        });
-		
-        return message.reply("Successfully saved file changes!");
+            if (!args[0]) return message.channel.send("**Error!** Please use at least 1 argument!");
+            if (args[1]) return message.channel.send("**Error!** Too many arguments. 1 expected, got " + args.length);
+
+            if (args[0] == "true") {
+
+                guildSettings[message.guild.id].ban = true;
+                message.channel.send("Now banning join/leave advertisements!");
+
+                save();
+
+            } else if (args[0] == "false") {
+
+                guildSettings[message.guild.id].ban = false;
+                message.channel.send("Now kicking join/leave advertisements!");
+
+                save();
+
+            } else {
+                message.channel.send("**Error!** Expected argument 'true' or 'false' but got: " + args[0]);
+            }
+
+        } else {
+            message.channel.send("You do not have permission to execute this command!");            
+        }
+    }
+
+    //SET ACTIONLOG
+    //SET ACTIONLOG
+    //SET ACTIONLOG
+    if (command == "set-actionlog" && message.content.startsWith(prefix)) {
+        if (message.member.hasPermission("ADMINISTRATOR")) {
+        
+            if (!args[0]) return message.channel.send("**Error!** Please use at least 1 argument!");
+            if (args[1]) return message.channel.send("**Error!** Too many arguments. 1 expected, got " + args.length);
+
+            if (args[0] == "true") {
+
+                guildSettings[message.guild.id].actionMessage = true;
+                message.channel.send("Now sending action logs!");
+
+            } else if (args[0] == "false") {
+
+                guildSettings[message.guild.id].actionMessage = false;
+                message.channel.send("Now hiding action logs!");
+
+            } else {
+                message.channel.send("**Error!** Expected argument 'true' or 'false' but got: " + args[0]);
+            }
+
+        } else {
+            message.channel.send("You do not have permission to execute this command!");            
+        }
+    }
+
+    //SET MESSAGE
+    //SET MESSAGE
+    //SET MESSAGE
+    if (command == "set-message" && message.content.startsWith(prefix)) {
+        if (message.member.hasPermission("ADMINISTRATOR")) {
+            if (guildSettings[message.guild.id].isPremium == true) {
+
+            } else {
+                message.channel.send("**Error!** You do not have ADPREV-Premium!");
+            }
+
+        } else {
+            message.channel.send("You do not have permission to execute this command!");            
+        }
+    }
+
+    //SETTINGS
+    //SETTINGS
+    //SETTINGS
+    if (command == "settings" && message.content.startsWith(prefix)){
+
+        let settings = new Discord.RichEmbed()
+        .setColor(getRandomColor())
+        .setTitle("Settings")
+        .addBlankField(true)
+        .addField("Command prefix", guildSettings[message.guild.id].prefix)
+        .addField("Join/leave channel", guildSettings[message.guild.id].channel)
+        .addField("Ban offenders", guildSettings[message.guild.id].ban)
+        .addField("Action messages", guildSettings[message.guild.id].actionMessage)
+
+        message.channel.send(settings).then(message);
+
+    }
+    //INVITE
+    //INVITE
+    //INVITE
+    if (command == "invite" && message.content.startsWith(prefix)){
+
+        message.channel.send("I am a public bot! Invite me to your own server using this link: \n https://discordapp.com/api/oauth2/authorize?client_id=503687810885353472&permissions=8&scope=bot");
 
     }
 
-    if (command == "roadmap" && message.content.startsWith(prefix)) {
+    //DEBUG
+    //DEBUG
+    //DEBUG
+    if (command == "debug" && message.content.startsWith(prefix)){
 
-        if (args[0] == "add") {
+        if (message.author.id == 365452203982323712) {
 
-            var featureToAdd = args.join(" ").slice("4");
+            let messageToSend = message.content.slice(command.length + 2);
+            let servers = Object.keys(guildSettings);
+            for (o = 0; o < servers.length; o++){
 
-            if (!message.member.hasPermission("ADMINISTRATOR")) return message.reply("ERROR! You are not an administrator!");
+                let curServer = bot.guilds.get(servers[o]);
+                //let curChannel = bot.curServer.channels.find('name', guildSettings[servers[o]].channel);
 
-            botconfig.roadMap.push(featureToAdd);
-            message.reply("Successfully added planned feature!")
+                console.log(o);
 
-        } else if (args[0] == "remove") {
+                if (guildSettings[servers[o]].channel == 'none' || guildSettings[servers[o]].channel == undefined) {
 
-            var featureToRemove = args.join(" ").slice("7");
+                    curServer.channels.filter(channel => channel.type == "text").random().send(messageToSend).catch(err => console.log(err));
 
-            for (var g = botconfig.roadMap.length; g >= 0; g--) {
-                if (botconfig.roadMap[g] == featureToRemove) {
+                } else {
 
-                    botconfig.roadMap.splice(g, 1);
+                    curServer.channels.find('name', guildSettings[servers[o]].channel).send(messageToSend);
+                    
+                }
+
+                if (o == servers.length){
+
+                    message.channel.send("Message sent to all servers!");
 
                 }
-            }
-
-            message.reply("Successfully removed planned feature!")
-
-        } else  {
-
-            var roadMap = botconfig.roadMap
-            var roadMapMessage = "What my mommy is planning to implement soon is:\n"
-            
-            if (roadMap.length <= 0) return message.reply("There are currently no planned new features!");
-
-            for (var c = 0; c < roadMap.length; c++) {
-
-                roadMapMessage += roadMap[c] + "\n"
 
             }
+        } else {
+            message.channel.send(errorCode(1));
+        }
+    }
 
-            message.reply(roadMapMessage);
+    //FETCHINVITE
+    //FETCHINVITE
+    //FETCHINVITE
+    if(command == "fetchinvite" && message.content.startsWith(prefix)) {
 
+        if (message.author.id == 365452203982323712){
+
+        } else {
+
+        }
+
+    }
+
+    //HELP
+    //HELP
+    //HELP
+    if (message.mentions.members.first()) {
+
+        let checkMention = String(message.mentions.members.first().user.username);
+        if (checkMention.includes(bot.user.username)) {
+
+            message.reply("My prefix for this server is: " + guildSettings[message.guild.id].prefix + " use the " + guildSettings[message.guild.id].prefix + "help command for more info");
+
+        } else {
             return;
         }
     }
 
-    if (command == "copyright" && message.content.startsWith(prefix)) return message.reply("\nTHE SOFTWARE IS PROVIDED 'AS IS' AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE. \n\nCopyright © 2018 Asuna#3119, All rights reserved");
+    if (command == "help" && message.content.startsWith(prefix)) {
 
-    // Variable declarations
-    const getCategory = message.channel.parentID;
-    const csao = "456391975630012428";
-    const cafo = "456392015412854796";
-    const cggo = "456413358556577792";
+        let embed = new Discord.RichEmbed()
+        .setColor(getRandomColor())
+        .setTitle("ADPREV Command Help")
+        .addField("What is ADPREV?", "ADPREV is a bot developed by Asuna#1000. ADPREV is a configurable bot that bans/kicks any user that has a link in their username to advertise their social platforms, and deletes any welcoming messages.")
+        .addBlankField(true)
+        .addField("User with a link not kicked/banned and no message was deleted?", "Please contact Asuna#1000 and send her the link this user had in their username, the domain is probbably not registered within ADPREV's database yet.")
+        .addBlankField(true)
+        .addField(guildSettings[message.guild.id].prefix + "set-prefix [prefix]", "Set the command prefix.")
+        .addField(guildSettings[message.guild.id].prefix + "set-channel [channel]", "Set your join/leave message channel.")
+        .addField(guildSettings[message.guild.id].prefix + "set-ban [true/false]", "Toggle banning on or off.")
+        .addField(guildSettings[message.guild.id].prefix + "set-message [true/false]", "Toggle action messages on or off.")
+        .addField(guildSettings[message.guild.id].prefix + "settings", "See all your current settings.")
+        .addField(guildSettings[message.guild.id].prefix + "invite", "Get the bot invite link to add it to your own server.")
+        .addBlankField(true)
+        .addField("Support", "For additional help, contact Asuna#1000");
 
-
-    if (message.channel.id == 460837086996594689) {
-
-        //,docs textchannel#settopic
-
+        message.channel.send(embed)
     }
 
-    // SAO section
-    if (getCategory == csao || message.channel.id == botconfig.debugChannel) {
-
-        if (!sao[message.author.id]){
-
-            if (message.author.bot) return;
-
-            message.reply("Hey! I created a profile for you! you didn't seem to have one!");
-    
-            sao[message.author.id] = {
-                playerXp: 0,
-                playerLevel: 1,
-                playerHealth: 100,
-                PlayerMaxHealth: 100,
-                playerCor: 150,
-                playerInventory: [],
-                playerTotalXp: 0,
-                playerKills: 0,
-                playerDamage: 10,
-                enemyCurrent: "none",
-                enemyCurrentHP: 0,
-                enemyMaxHP: 0,
-                enemyDamage: 0,
-            }
-
-            fs.writeFile("./sao.json", JSON.stringify(sao), (err) => {
-
-                if (err) console.log(err);    
-
-            });
-        }
-        
-
-    if (command == "fight" && message.content.startsWith(prefix)) {
-
-        var getLevel = sao[message.author.id].enemyLevel;
-        var getPlayerLevel = sao[message.author.id].playerLevel;
-
-        if (args[0] == "Boar" || args[0] == "boar") {
-            
-            // Boars do 10 to 15 damage if their strike hits
-            // Boars have 100HP multiplied by their level on a 1.1 scale (meaning a level 2 boar does 1.2X damage)
-            // Boars can only be killed on floor 1
-
-            if (message.channel.id == "456433914999996437" || message.channel.id == botconfig.debugChannel && sao[message.author.id].enemyCurrent != "Boar") {
-
-                var randomBoarLevel = Math.floor(Math.random() * 12 + 1);
-                
-                sao[message.author.id].enemyLevel = randomBoarLevel;
-
-                var boarGetHP = sao[message.author.id].enemyLevel * 2.5 + 50;           
-
-                sao[message.author.id].enemyCurrent = "Boar";          
-                sao[message.author.id].enemyCurrentHP = boarGetHP;
-                sao[message.author.id].enemyMaxHP = boarGetHP;
-
-                return message.reply("You started a fight with a Boar level: " + sao[message.author.id].enemyLevel + ", to attack this creature again, simply use yui-fight untill it dies! Watch your health!");
-            
-            } else {
-
-                return message.reply("ERROR! My cardinal system says you're already fighting this creature! Use yui-fight instead!");
-
-            }
-
-        } else {
-
-            if (sao[message.author.id].enemyCurrent == "none") return message.reply("ERROR! My cardinal system says that you're not in combat!");
-
-            
-
-            var boarAttacks = ["Oh no! The boar changed his direction, and dodged your attack!", "Oh no!The boar stepped aside, and rushed towards you!", "Oh no! The boar used your movement against you!", "Oh no! You got tired, and the boar used this moment to attack!"];
-            var boarIndex = Math.floor(Math.random() * boarAttacks.length);
-            var calcPlayerDamage = Math.floor(Math.random() * getPlayerLevel + sao[message.author.id].playerDamage);
-            var chanceToHit = Math.floor(Math.random() * 100 +1);
-
-            if (chanceToHit >= 40 && sao[message.author.id].enemyCurrent != "none") {
-
-                message.reply("You attacked a boar! Dealing " + calcPlayerDamage + " Damage!");
-                sao[message.author.id].enemyCurrentHP -= calcPlayerDamage;
-
-                console.log("true");
-
-            }
-            if (chanceToHit < 40 && sao[message.author.id].enemyCurrent != "none") {
-
-                var boarDamage = getDamage(5, 15);
-
-                message.reply(boarAttacks[boarIndex] + " Dealing " + boarDamage + " Damage!");
-
-                sao[message.author.id].playerHealth -= boarDamage;
-
-                console.log("true");
-
-            }
-
-            if (sao[message.author.id].enemyCurrentHP <= 0 && sao[message.author.id].enemyCurrent != "none") {
-
-                var randomBoarExp = Math.floor(Math.random()* 30 +1);
-
-                enemyKilled(message.author.id);
-                levelUp(sao[message.author.id].playerXp, message.author.id);
-
-                return message.reply("You killed a boar! His level was: " + getLevel)
-            }
-            return;
-        }
-        return;
-    }
-
-
-    if (command == "profile" && message.content.startsWith(prefix)) {
-
-        if (!args[0]) {
-
-        let profileEmbed = new Discord.RichEmbed()
-        .setTitle(message.author.tag + "'s profile!")
-
-        return message.channel.send(profileEmbed);
-        } else {
-
-
-
-        }
-
-        message.reply("Your current health is: " + sao[message.author.id].playerHealth+ "/" + sao[message.author.id].maxPlayerHealth);
-
-        return;
-    }
-}
-
-    //TODO
-
-    // AFO section
-
-    // GGO section
-
-//This is the end of bot.on("message", message)
-//This is the end of bot.on("message", message)
-//This is the end of bot.on("message", message)
-//This is the end of bot.on("message", message)
 });
 
+bot.on('error', console.error);
+
+function errorCode(code){
+
+    if (code = 0){
+
+    } else if (code = 1) {
+    
+    } else if (code = 2) {
+
+    } else if (code = 3) {
+
+    } else if (code = 4) {
+        return "**ERROR**"
+    } else {
+        return "**ERROR** Unknown error!";
+    }
+
+}
+
 function getRandomColor() {
-    var letters = '0123456789ABCDEF';
-    var color = '#';
-    for (var i = 0; i < 6; i++) {
+    let letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
       color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
 }
 
-function getDamage(min, max) {
-    var randomDamage = Math.floor(Math.random()* max + min);
-
-    return randomDamage;
+function save(){
+    fs.writeFile("./guildSettings.json", JSON.stringify(guildSettings), (err) => {
+        if (err) console.log(err);
+    });
 }
 
-function levelUp(exp, id){
-    let levelExp = (sao[id].level^1.5) * 150;
-    if (exp >= levelExp) {
+function runCheck(user, content){
 
-        sao[id].playerLevel += 1;
-        message.channel.send("Wow! You levelled up! Your new level is: " + sao[message.author.id].playerLevel);
+    let counter = 0;
 
+    if (guildSettings[user.guild.id].channel == 'none'){
         return;
+    }
+
+    for (i = 0; i <= botconfig.bannedTags.length; i++) {
+
+        if(content.includes(botconfig.bannedTags[i])){
+
+            counter++;
+
+        }
+        if (counter == 2){
+            
+            if (guildSettings[user.guild.id].ban == true) {
+
+                user.ban("Advertisement Bot/user").catch(err => console.log(err));
+
+                if(guildSettings[user.guild.id].actionMessage == true) {
+
+                    bot.channels.find('name', guildSettings[user.guild.id].channel).send(guildSettings[user.guild.id].banMessage);
+                    
+                } else {
+                    return;
+                }
+
+            } else {
+
+                user.kick("Advertisement Bot/user").catch(err => console.log(err));
+
+                if(guildSettings[user.guild.id].banMessage == true) {
+
+                    bot.channels.find('name', guildSettings[user.guild.id].channel).send(guildSettings[user.guild.id].banMessage);
+                    
+                } else {
+                    return;
+                }
+
+            }
+
+            return;
+        }
+
+
     }
     return;
 }
-function enemyKilled(id){
 
-    sao[id].enemyCurrent = "none";
-    sao[id].enemyCurrentHP = 0;
-    sao[id].enemyMaxHP = 0;
-    sao[id].enemyDamage = 0;
-
-    sao[id].playerKills += 1;
-
-    return;
-}
-
-var timesSaved = 0
+let timesSaved = 0
 setInterval(function(){
-
-    fs.writeFile("./sao.json", JSON.stringify(sao), (err) => {
-        if (err) console.log(err);        
-    });
-
-    fs.writeFile("./alo.json", JSON.stringify(alo), (err) => {
-        if (err) console.log(err);
-    });
-
-    fs.writeFile("./ggo.json", JSON.stringify(ggo), (err) => {
-        if (err) console.log(err);
-    });
 
     fs.writeFile("./botconfig.json", JSON.stringify(botconfig), (err) => {
         if (err) console.log(err);
     });
+    fs.writeFile("./guildSettings.json", JSON.stringify(guildSettings), (err) => {
+        if (err) console.log(err);
+    });
     
     timesSaved++
-    console.log("Saved any file changes to Saved: " + timesSaved + " times!");
+    console.log("Saved any file changes, Saved: " + timesSaved + " times!");
     
-}, 600000);
-
-function wait(ms){
-    var start = new Date().getTime();
-    var end = start;
-    while(end < start + ms) {
-      end = new Date().getTime();
-   }
-}
+}, 36000000);
 
 bot.login(botconfig.token);
