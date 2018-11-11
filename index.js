@@ -306,7 +306,7 @@ bot.on('message', (message) => {
 
         if (message.author.id == 365452203982323712) {
 
-            let messageToSend = message.content.slice(command.length + 2);
+            let messageToSend = message.content.slice(command.length + 3);
             let servers = Object.keys(guildSettings);
             for (o = 0; o < servers.length; o++){
 
@@ -332,6 +332,7 @@ bot.on('message', (message) => {
                 }
 
             }
+            message.channel.send("Message '" + messageToSend + "' sent across all servers!")
         } else {
             message.channel.send(errorCode(1));
         }
