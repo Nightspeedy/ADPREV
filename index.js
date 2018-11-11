@@ -50,8 +50,8 @@ bot.on('ready', async() => {
             setBotActivity = `Mention me!`;
 
         }
-        
-		bot.user.setActivity(setBotActivity);
+
+		bot.user.setActivity(setBotActivity, {type: "WATCHING"});
 		console.log("Set Activity to: "+ setBotActivity);
 
     }, 60000)
@@ -111,7 +111,7 @@ bot.on('message', (message) => {
             if (err) console.log(err);
         });
 
-        message.channel.send("Whoah! Something went wrong! Please re-configure me to your needs, Use " + guildSettings[message.guild.id].prefix + "help to get a list of my commands!" );
+        message.channel.send("**ERROR!** I could not find a configuration for this server! Please use " + guildSettings[message.guild.id].prefix + "help to get a list of my commands, and redo configuration!" );
 
         return;
     }
@@ -250,7 +250,7 @@ bot.on('message', (message) => {
             }
 
         } else {
-            message.channel.send("You do not have permission to execute this command!");            
+            message.channel.send("**Error!** You do not have permission to execute this command!");            
         }
     }
 
@@ -261,12 +261,15 @@ bot.on('message', (message) => {
         if (message.member.hasPermission("ADMINISTRATOR")) {
             if (guildSettings[message.guild.id].isPremium == true) {
 
+                guildSettings[message.guild.id].banMessage = message.content.slice(prefix.length + command.length + 1);
+                message.channel.send("Banmessage set to '" + guildSettings[message.guild.id].banMessage + "'");
+
             } else {
                 message.channel.send("**Error!** You do not have ADPREV-Premium!");
             }
 
         } else {
-            message.channel.send("You do not have permission to execute this command!");            
+            message.channel.send("**Error!** You do not have permission to execute this command!");            
         }
     }
 
@@ -296,10 +299,10 @@ bot.on('message', (message) => {
 
     }
 
-    //DEBUG
-    //DEBUG
-    //DEBUG
-    if (command == "debug" && message.content.startsWith(prefix)){
+    //GLOBAL MESSAGE
+    //GLOBAL MESSAGE
+    //GLOBAL MESSAGE
+    if (command == "global-message" && message.content.startsWith(prefix)){
 
         if (message.author.id == 365452203982323712) {
 
@@ -342,7 +345,7 @@ bot.on('message', (message) => {
         if (message.author.id == 365452203982323712){
 
         } else {
-
+            return message.channel.send("**Error!** You do not have permission to execute this command!");
         }
 
     }
@@ -386,24 +389,6 @@ bot.on('message', (message) => {
 });
 
 bot.on('error', console.error);
-
-function errorCode(code){
-
-    if (code = 0){
-
-    } else if (code = 1) {
-    
-    } else if (code = 2) {
-
-    } else if (code = 3) {
-
-    } else if (code = 4) {
-        return "**ERROR**"
-    } else {
-        return "**ERROR** Unknown error!";
-    }
-
-}
 
 function getRandomColor() {
     let letters = '0123456789ABCDEF';
