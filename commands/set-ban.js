@@ -33,7 +33,8 @@ module.exports.run = async(bot, message, args) => {
 
 }
 module.exports.help = {
-    name: "set-ban"
+    name: "set-ban",
+    description: "This command will be removed soon."
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

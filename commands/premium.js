@@ -24,7 +24,8 @@ module.exports.run = async(bot, message, args) => {
 
 }
 module.exports.help = {
-    name: "premium"
+    name: "premium",
+    description: "BOT OWNER ONLY! Sets the premium status of a server."
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

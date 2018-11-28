@@ -23,7 +23,8 @@ module.exports.run = async(bot, message, args) => {
 }
 
 module.exports.help = {
-    name: "set-prefix"
+    name: "set-prefix",
+    description: "Set the command prefix"
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

@@ -21,7 +21,8 @@ module.exports.run = async(bot, message, args) => {
 }
 
 module.exports.help = {
-    name: "set-message"
+    name: "set-message",
+    description: "This command will be removed soon."
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

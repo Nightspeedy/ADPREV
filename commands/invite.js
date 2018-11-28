@@ -9,7 +9,8 @@ module.exports.run = async(bot, message, args) => {
 
 }
 module.exports.help = {
-    name: "invite"
+    name: "invite",
+    description: "Get bot invite link."
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

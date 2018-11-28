@@ -8,7 +8,8 @@ module.exports.run = async(bot, message, args) => {
 
         if (!args[0]) return message.channel.send("**Error!** Please use at least 1 argument!");
         if (args[1]) return message.channel.send("**Error!** Too many arguments. 1 expected, got " + args.length);
-        if (isNaN(args[0])) return message.channel.send("Error! Expected argument is not a number!");
+        if (isNaN(args[0])) return message.channel.send("**Error!** Expected argument is not a number!");
+        if (args[0] > 5000) return message.channel.send("**Error!** I can't purge more then 5000 messages at once!")
 
         message.delete();
         message.channel.bulkDelete(args[0]).then(message.channel.send("Deleted: " + args[0] + " messages!").then(message => message.delete(10000)))
@@ -19,7 +20,8 @@ module.exports.run = async(bot, message, args) => {
 
 }
 module.exports.help = {
-    name: "purge"
+    name: "purge",
+    description: "Purge an X amount of messages."
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

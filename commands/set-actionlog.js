@@ -29,7 +29,8 @@ module.exports.run = async(bot, message, args) => {
 
 }
 module.exports.help = {
-    name: "set-actionlog"
+    name: "set-actionlog",
+    description: "This command will be removed soon."
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
