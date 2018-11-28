@@ -28,7 +28,7 @@ module.exports.run = async(bot, message, args) => {
         }
 
     } else {
-        message.channel.send("You do not have permission to execute this command!");            
+        message.channel.send("**Error!** You do not have permission to execute this command!");         
     }
 
 }

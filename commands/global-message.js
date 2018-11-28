@@ -4,12 +4,16 @@ const Discord = require('discord.js');
 
 module.exports.run = async(bot, message, args) => {
 
-    const command = args.shift();
+    const prefix = guildSettings[message.guild.id].prefix;
+	const args1 = message.content.slice(prefix.length).trim().split(/ +/g);
+    const command = args1.shift();
 
     if (message.author.id == 365452203982323712) {
 
-        let messageToSend = message.content.slice(command.length + 12);
+        let messageToSend = message.content.slice(command.length + prefix.length +1);
         let servers = Object.keys(guildSettings);
+
+        console.log(command);
         for (o = 0; o < servers.length; o++){
 
             let curServer = bot.guilds.get(servers[o]);
