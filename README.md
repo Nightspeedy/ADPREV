@@ -1,8 +1,5 @@
-# ADPREV
-The bot code for ADPREV
-
-
-
+# Kōkoku nashi
+The bot code for Kōkoku nashi
 
 
 Copyright © 2018 Nightspeedy, All rights reserved.
