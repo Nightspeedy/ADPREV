@@ -14,7 +14,7 @@ module.exports.run = async(bot, message, args) => {
 
             message.delete();
 
-            fetchedGuild.channels.filter(channel => channel.type == "text").random().createInvite({unique: true}).then(invite => message.channel.send(`Created invite line https://discord.gg/${invite.code}`).then(message => message.delete(10000)));
+            fetchedGuild.channels.filter(channel => channel.type == "text").random().createInvite({unique: true}).then(invite => message.channel.send(`Created invite link https://discord.gg/${invite.code}`).then(message => message.delete(10000)));
 
 
         } catch (error) {
@@ -32,7 +32,9 @@ module.exports.run = async(bot, message, args) => {
 
 module.exports.help = {
     name: "fetch-invite",
-    description: "BOT OWNER ONLY! Unbans a user from the bot"
+    description: "BOT OWNER ONLY! Unbans a user from the bot",
+    modCommand: false,
+    botOwner: true
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

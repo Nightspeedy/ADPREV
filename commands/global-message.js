@@ -41,7 +41,9 @@ module.exports.run = async(bot, message, args) => {
 
 module.exports.help = {
     name: "global-message",
-    description: "BOT OWNER ONLY! Send a message to every server, used for update notes"
+    description: "BOT OWNER ONLY! Send a message to every server, used for update notes",
+    modCommand: false,
+    botOwner: true
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

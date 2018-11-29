@@ -391,7 +391,12 @@ bot.on('message', (message) => {
     }
 });
 
-bot.on('error', console.error);
+bot.on('error', error =>{
+
+    console.error
+    bot.fetchUser("365452203982323712").channel.send("**Error!** Bot error! \n" + error ).catch(err => {if (err) console.log(err);});
+
+});
 
 function getRandomColor() {
     let letters = '0123456789ABCDEF';

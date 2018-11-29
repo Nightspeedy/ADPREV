@@ -19,7 +19,9 @@ module.exports.run = async(bot, message, args) => {
 
 module.exports.help = {
     name: "settings",
-    description: "This command will be removed soon."
+    description: "This command will be removed soon.",
+    modCommand: false,
+    botOwner: false
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

@@ -37,7 +37,9 @@ module.exports.run = async(bot, message, args) => {
 
 module.exports.help = {
     name: "bot-pardon",
-    description: "BOT OWNER ONLY! Unbans a user from the bot"
+    description: "BOT OWNER ONLY! Unbans a user from the bot",
+    modCommand: false,
+    botOwner: true
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

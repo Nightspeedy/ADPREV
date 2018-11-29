@@ -23,7 +23,9 @@ module.exports.run = async(bot, message, args) => {
 }
 module.exports.help = {
     name: "set-channel",
-    description: "This command will be removed soon."
+    description: "This command will be removed soon.",
+    modCommand: true,
+    botOwner: false
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

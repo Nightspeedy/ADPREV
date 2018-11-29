@@ -12,23 +12,76 @@ module.exports.run = async(bot, message, args) => {
     //console.log(bot.commands);
     let commands = bot.commands.keyArray();
 
-    for (i = 0; i < commands.length; i++) {
+    if (!args[0]) {
 
-        let getObject = bot.commands.get(commands[i])
+        for (i = 0; i < commands.length; i++) {
 
-        if(commands[i] == "help") {
-            
-        } else {
-            embed.addField(getObject.help.name, getObject.help.description);
-        }
-    }
+            let getObject = bot.commands.get(commands[i])
     
-    message.channel.send(embed)
+            if(commands[i] == "help") {
+                
+            } else {
+                if (getObject.help.modCommand == true || getObject.help.botOwner == true) {
+
+                } else {
+                    embed.addField(guildSettings[message.guild.id].prefix + getObject.help.name, getObject.help.description);
+                }
+            }
+        }
+        embed.setFooter("Show moderator commands with " + guildSettings[message.guild.id].prefix + "help moderator");
+        
+        message.channel.send(embed)
+
+    } else if (args[0] == "moderator") {
+
+        console.log("y")
+
+        for (i = 0; i < commands.length; i++) {
+
+            let getObject = bot.commands.get(commands[i])
+    
+            if(commands[i] == "help") {
+                
+            } else {
+                if (getObject.help.modCommand == false) {
+
+                } else {
+                    embed.addField(guildSettings[message.guild.id].prefix + getObject.help.name, getObject.help.description);
+                }
+            }
+        }
+
+        message.channel.send(embed);
+    }else if (args[0] == "owner") {
+
+        console.log("y")
+
+        for (i = 0; i < commands.length; i++) {
+
+            let getObject = bot.commands.get(commands[i])
+    
+            if(commands[i] == "help") {
+                
+            } else {
+                if (getObject.help.botOwner == false) {
+
+                } else {
+                    embed.addField(guildSettings[message.guild.id].prefix + getObject.help.name, getObject.help.description);
+                }
+            }
+        }
+
+        message.channel.send(embed);
+    } else {
+        message.channel.send("**Error!** Unknown error!");
+    }
 }
 
 module.exports.help = {
     name: "help",
-    description: "The help command."
+    description: "The help command.",
+    modCommand: false,
+    botOwner: false
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

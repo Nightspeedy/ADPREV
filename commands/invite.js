@@ -4,13 +4,15 @@ const Discord = require('discord.js');
 
 module.exports.run = async(bot, message, args) => {
     
-   message.channel.send("I am a public bot! Invite me to your own server using this link: \n https://discordapp.com/api/oauth2/authorize?client_id=503687810885353472&permissions=8&scope=bot");
+   message.channel.send("I am a public bot! Invite me to your own server using this link: \nhttps://discordapp.com/oauth2/authorize?client_id=503687810885353472&scope=bot&permissions=536210647");
 
 
 }
 module.exports.help = {
     name: "invite",
-    description: "Get bot invite link."
+    description: "Get bot invite link.",
+    modCommand: false,
+    botOwner: false
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

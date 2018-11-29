@@ -4,8 +4,10 @@ const Discord = require('discord.js');
 
 module.exports.run = async(bot, message, args) => {
 
+    // Check if the caller is me, if it's not, return
     if (message.author.id == 365452203982323712) {
 
+        // Make sure i use the correct arguments
         if (!args[0]) return message.channel.send("**Error!** Please use at least 1 argument!");
         if (args[1]) return message.channel.send("**Error!** Too many arguments. 1 expected, got " + args.length);
         
@@ -16,6 +18,7 @@ module.exports.run = async(bot, message, args) => {
         if (args[0] == message.author.id) return message.channel.send("**Error!** You cannot ban yourself!");
         if (!members[args[0]]) return message.channel.send("**Error!** User does not exist in my database!");
 
+        // Check if a user is already banned, return if they are.
         if (members[args[0]].isBanned == false) {
 
             members[args[0]].isBanned = true;
@@ -42,7 +45,9 @@ module.exports.run = async(bot, message, args) => {
 
 module.exports.help = {
     name: "bot-ban",
-    description: "BOT OWNER ONLY! Bans a user from the bot."
+    description: "BOT OWNER ONLY! Bans a user from the bot.",
+    modCommand: false,
+    botOwner: true
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
