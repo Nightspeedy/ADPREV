@@ -21,7 +21,6 @@ module.exports.run = async(bot, message, args) => {
             addString =  (args[i] + " ");
             
             finalStr += addString;
-            console.log(finalStr);
 
         }
         // Try to ban the user
@@ -48,6 +47,7 @@ module.exports.run = async(bot, message, args) => {
                 }
             }).catch(err => {
 
+                message.channel.send("**Error!** I couldn't ban this user! Do i have the right permissions?");
                 console.log(err)
 
             });
