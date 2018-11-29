@@ -22,7 +22,7 @@ module.exports.run = async(bot, message, args) => {
 
 }
 module.exports.help = {
-    name: "set-logChannel",
+    name: "set-logchannel",
     description: "Sets the logging channel. (Only commands of this bot get logged at this moment)   ",
     modCommand: true,
     botOwner: false
