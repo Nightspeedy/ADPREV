@@ -35,7 +35,8 @@ module.exports.help = {
     description: "BOT OWNER ONLY! Fetches a server, and returns an instant invite.",
     args: "[ServerID]",
     modCommand: false,
-    botOwner: true
+    botOwner: true,
+    utillity: false,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

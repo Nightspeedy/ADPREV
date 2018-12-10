@@ -80,7 +80,8 @@ module.exports.help = {
     description: "Gamble your coins. Get something, or get nothing.",
     args: "[Amount]",
     modCommand: false,
-    botOwner: false
+    botOwner: false,
+    utility: false,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

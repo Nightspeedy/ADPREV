@@ -68,7 +68,8 @@ module.exports.help = {
     description: "Kicks a user from the server.",
     args: "[@user] [Reason]",
     modCommand: true,
-    botOwner: false
+    botOwner: false,
+    utility: false,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

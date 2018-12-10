@@ -41,7 +41,7 @@ module.exports.help = {
     args: "[@user/userID]",
     modCommand: false,
     botOwner: true,
-    utillity: false,
+    utility: false,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

@@ -32,7 +32,8 @@ module.exports.help = {
     description: "Get the bot-uptime.",
     args: "This command has no arguments.",
     modCommand: false,
-    botOwner: false
+    botOwner: false,
+    utility: true,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

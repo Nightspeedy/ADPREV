@@ -72,7 +72,8 @@ module.exports.help = {
     description: "Request a new feature.",
     args: "[your feature] BOT-OWNER ONLY -> {list/remove [index number]}",
     modCommand: false,
-    botOwner: false
+    botOwner: false,
+    utility: true,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

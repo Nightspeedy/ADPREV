@@ -44,7 +44,8 @@ module.exports.help = {
     description: "BOT OWNER ONLY! Send a message to every server, used for update notes.",
     args: "[Message]",
     modCommand: false,
-    botOwner: true
+    botOwner: true,
+    utility: false,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

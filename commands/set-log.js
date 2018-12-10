@@ -25,7 +25,8 @@ module.exports.help = {
     description: "Sets the logging channel. (Only commands of this bot get logged at this moment)   ",
     args: "[#channel]",
     modCommand: true,
-    botOwner: false
+    botOwner: false,
+    utility: false,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

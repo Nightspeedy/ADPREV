@@ -12,23 +12,46 @@ module.exports.run = async(bot, message, args) => {
     //console.log(bot.commands);
     let commands = bot.commands.keyArray();
 
+    let gen = "";
+    let util = "";
+    let mods = "";
+
     if (!args[0]) {
 
         for (i = 0; i < commands.length; i++) {
 
-            let getObject = bot.commands.get(commands[i])
+            let getCommand = bot.commands.get(commands[i])
     
-            if(commands[i] == "help") {
-                
-            } else {
-                if (getObject.help.modCommand == true || getObject.help.botOwner == true) {
+            if (getCommand.help.modCommand == true) {
 
-                } else {
-                    embed.addField(guildSettings[message.guild.id].prefix + getObject.help.name, getObject.help.description);
-                }
+                mods += " `" + getCommand.help.name + "` ";
+
+            } else if( getCommand.help.utility == true) {
+
+                util += " `" + getCommand.help.name + "` ";                
+
+            } else if (getCommand.help.botOwner == true) {
+
+            } else {
+                
+                gen += " `" + getCommand.help.name + "` ";                
+
             }
         }
-        embed.setFooter("Show moderator commands with " + guildSettings[message.guild.id].prefix + "help moderator");
+        for (i = 0; i < commands.length; i++) {
+
+            let getCommand = bot.commands.get(commands[i])
+
+            if (getCommand.help.botOwner == true) {
+                commands.splice(i, 1)
+            }
+        }
+
+        embed.setDescription("Use " + guildSettings[message.guild.id].prefix +"help [command] for detailed command information.")
+        embed.addField("General commands", gen);
+        embed.addField("Utility commands", util);
+        embed.addField("Mod commands", mods);
+        embed.setFooter("Total commands: " + commands.length)
         
         message.channel.send(embed)
 
@@ -52,7 +75,8 @@ module.exports.help = {
     description: "The help command.",
     args: "{Command}",
     modCommand: false,
-    botOwner: false
+    botOwner: false,
+    utility: true,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

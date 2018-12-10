@@ -83,7 +83,8 @@ module.exports.help = {
     description: "Gives someone a reputation point.",
     args: "[@user]",
     modCommand: false,
-    botOwner: false
+    botOwner: false,
+    utility: false,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

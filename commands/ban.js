@@ -70,7 +70,8 @@ module.exports.help = {
     description: "Bans a user from the server.",
     args: "[@user] [reason]",
     modCommand: true,
-    botOwner: false
+    botOwner: false,
+    utility: false,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

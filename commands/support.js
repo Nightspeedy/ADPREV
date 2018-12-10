@@ -25,7 +25,8 @@ module.exports.help = {
     description: "Support",
     args: "This command has no arguments.",
     modCommand: false,
-    botOwner: false
+    botOwner: false,
+    utility: true,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

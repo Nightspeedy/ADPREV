@@ -36,7 +36,8 @@ module.exports.help = {
     description: "Purge an X amount of messages.",
     args: "[Amount(1 to 100)]",
     modCommand: true,
-    botOwner: false
+    botOwner: false,
+    utility: false,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

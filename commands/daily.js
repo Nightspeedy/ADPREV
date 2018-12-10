@@ -99,7 +99,8 @@ module.exports.help = {
     description: "Claim your daily free credits.",
     args: "{@user}",
     modCommand: false,
-    botOwner: false
+    botOwner: false,
+    utility: false,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

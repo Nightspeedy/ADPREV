@@ -27,7 +27,8 @@ module.exports.help = {
     description: "Set the command prefix.",
     args: "[New prefix]",
     modCommand: true,
-    botOwner: false
+    botOwner: false,
+    utility: false,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

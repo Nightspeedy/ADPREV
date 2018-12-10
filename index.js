@@ -9,14 +9,10 @@ const botconfig = require('./botconfig.json');
 const guildSettings = require('./guildSettings.json');
 const members = require('./members.json');
 const levelSystem = require('./levelSystem.js');
-const SQLite = require("better-sqlite3");
-const sql = new SQLite('./scores.sqlite');
 let cooldown = new Set();
 var moment = require('moment');
 
 const fs = require('fs');
-
-const botName = "adprev";
 
 console.log("Starting bot...");
 console.log("Setting start time...");
@@ -50,7 +46,7 @@ fs.readdir("./commands/", (err, files) => {
         bot.commands.set(props.help.name, props)
 
     });
-    console.log("Commands loaded!")
+    console.log("Commands loaded!");
 });
 
 bot.on('ready', async() => {
@@ -74,7 +70,7 @@ bot.on('ready', async() => {
 
         } else if (setBotActivity == `over ${keys.length} members`) {
 
-            setBotActivity = `over ${bot.guilds.size} guilds!`;
+            setBotActivity = `over ${guildSize} guilds!`;
 
         } else {
 
@@ -83,7 +79,6 @@ bot.on('ready', async() => {
         }
 
 		bot.user.setActivity(setBotActivity, {type: "WATCHING"});
-		console.log("Set Activity to: "+ setBotActivity);
 
     }, 60000)
 
@@ -125,10 +120,7 @@ bot.on('guildCreate', (guild) => {
 
             prefix: 'k!',
             channel: 'none',
-            ban: false,
-            actionMessage: true,
             isPremium: false,
-            banMessage: "An advertising bot has been banned!",
 
         }
 
@@ -151,13 +143,7 @@ bot.on('guildDelete', (guild) => {
 
 bot.on('guildMemberAdd', (member) => {
 
-    let getMemberName = String(member.user.username);
-    
-    runCheck(member, getMemberName);
-
 });
-
-
 
 bot.on('message', (message) => {
 
@@ -183,20 +169,13 @@ bot.on('message', (message) => {
 
             prefix: 'k!',
             channel: 'none',
-            ban: false,
-            actionMessage: true,
             isPremium: false,
-            banMessage: "An advertising bot has been banned!",
 
         }
 
         fs.writeFile("./guildSettings.json", JSON.stringify(guildSettings), (err) => {
             if (err) console.log(err);
         });
-
-        // And send an error message to notify them something went wrong.
-        message.channel.send("**ERROR!** I could not find a configuration for this server! Please use " + guildSettings[message.guild.id].prefix + "help to get a list of my commands, and redo configuration!" );
-
         return;
     }
 
@@ -225,18 +204,15 @@ bot.on('message', (message) => {
         }
     }
     
-
     // Some command mumbo-jumbo.
     const prefix = guildSettings[message.guild.id].prefix;
     const args = message.content.slice(prefix.length).trim().split(/ +/g);
     const command = args.shift();
 
-
-
     // Check if message's are sent by users in the server.
     if (message.author.bot) return;
 
-    // if a command is registered and the message starts with the prefix, run the command.
+    // If a command is registered and the message starts with the prefix, run the command.
     if (command && message.content.startsWith(prefix)) {
 
         // Check if a user recently used a command
@@ -247,7 +223,7 @@ bot.on('message', (message) => {
             return message.channel.send("**Error!** Please wait 5 seconds between commands!").then(message => message.delete(5000));
         }
 
-
+        // Add a user to the timeout list
         if (message.author.id != 365452203982323712) {
             cooldown.add(message.author.id);
             setTimeout(() => {
@@ -256,15 +232,20 @@ bot.on('message', (message) => {
     
             }, 5000)
         }
+
+        // Make sure the code doesnt break here...
         if (!members[message.author.id].isBanned){
             members[message.author.id].isBanned = false;
         }
+
+        // Check if a user is banned
         if (members[message.author.id].isBanned == true) {
 
             return message.channel.send("**Error!** You are banned from using this bot!");
 
         } else {
             
+            // Run the command file
             let commandFile = bot.commands.get(command);
             if (!commandFile) return message.channel.send("**Error!** Unknown command!")
             commandFile.run(bot, message, args);
@@ -272,8 +253,6 @@ bot.on('message', (message) => {
         }
     }
     
-
-
     if (message.mentions.members.first()) {
 
                 
@@ -281,7 +260,7 @@ bot.on('message', (message) => {
 
         if (checkMention.includes(bot.user.username)) {
 
-            message.reply("My prefix for this server is: " + guildSettings[message.guild.id].prefix + " use the " + guildSettings[message.guild.id].prefix + "help command for more info");
+            message.channel.send("My prefix for this server is: " + guildSettings[message.guild.id].prefix + " use the " + guildSettings[message.guild.id].prefix + "help command for more info");
         
         }
         
@@ -313,57 +292,6 @@ function save(){
     fs.writeFile("./guildSettings.json", JSON.stringify(guildSettings), (err) => {
         if (err) console.log(err);
     });
-}
-
-function runCheck(user, content){
-
-    let counter = 0;
-
-    if (guildSettings[user.guild.id].channel == 'none'){
-        return;
-    }
-
-    for (i = 0; i <= botconfig.bannedTags.length; i++) {
-
-        if(content.includes(botconfig.bannedTags[i])){
-
-            counter++;
-
-        }
-        if (counter == 2){
-            
-            if (guildSettings[user.guild.id].ban == true) {
-
-                user.ban("Advertisement Bot/user").catch(err => console.log(err));
-
-                if(guildSettings[user.guild.id].actionMessage == true) {
-
-                    bot.channels.find('name', guildSettings[user.guild.id].channel).send(guildSettings[user.guild.id].banMessage);
-                    
-                } else {
-                    return;
-                }
-
-            } else {
-
-                user.kick("Advertisement Bot/user").catch(err => console.log(err));
-
-                if(guildSettings[user.guild.id].banMessage == true) {
-
-                    bot.channels.find('name', guildSettings[user.guild.id].channel).send(guildSettings[user.guild.id].banMessage);
-                    
-                } else {
-                    return;
-                }
-
-            }
-
-            return;
-        }
-
-
-    }
-    return;
 }
 
 let timesSaved = 0

@@ -28,7 +28,8 @@ module.exports.help = {
     description: "BOT OWNER ONLY! Sets the premium status of a server.",
     args: "[true/false]",
     modCommand: false,
-    botOwner: true
+    botOwner: true,
+    utility: false,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

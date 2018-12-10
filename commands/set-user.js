@@ -13,7 +13,8 @@ module.exports.help = {
     description: "BOT OWNER ONLY! Set's a user's credits.",
     args: "[@user/userID]",
     modCommand: false,
-    botOwner: true
+    botOwner: true,
+    utility: false,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

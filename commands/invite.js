@@ -13,7 +13,8 @@ module.exports.help = {
     description: "Get bot invite link.",
     args: "This command has no arguments",
     modCommand: false,
-    botOwner: false
+    botOwner: false,
+    utility: true,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

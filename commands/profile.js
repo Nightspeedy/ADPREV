@@ -70,7 +70,8 @@ module.exports.help = {
     description: "Show your, or someone else's profile.",
     args: "{@user/userID}",
     modCommand: false,
-    botOwner: false
+    botOwner: false,
+    utility: false,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

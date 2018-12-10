@@ -3,26 +3,24 @@ const fs = require('fs');
 const Discord = require('discord.js');
 
 module.exports.run = async(bot, message, args) => {
-
-    let settings = new Discord.RichEmbed()
+    
+    let embed = new Discord.RichEmbed()
+    .setTitle("TOS and Privacy")
     .setColor(getRandomColor())
-    .setTitle("Settings")
-    .addBlankField(true)
-    .addField("Command prefix", guildSettings[message.guild.id].prefix)
-    .addField("Join/leave channel", guildSettings[message.guild.id].channel)
-    .addField("Ban offenders", guildSettings[message.guild.id].ban)
-    .addField("Action messages", guildSettings[message.guild.id].actionMessage)
+    .setDescription("By interacting with the service (the bot) in any way, you agree to be bound by these terms.")
+    .addField("Terms of Service", "http://branco.roversplace.org/Kokoku-nashi-TermsOfService.pdf")
+    .addField("Privacy Policy", "http://branco.roversplace.org/Kokoku-nashi-privacypolicy.pdf")
 
-    message.channel.send(settings).then(message);
+    message.channel.send(embed)
 
 }
-
 module.exports.help = {
-    name: "settings",
-    description: "This command will be removed soon.",
-    args: "This command will be removed soon.",
+    name: "policy",
+    description: "the bot's Terms of Service, and privacy policy.",
+    args: "This command has no arguments",
     modCommand: false,
-    botOwner: false
+    botOwner: false,
+    utility: true,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
