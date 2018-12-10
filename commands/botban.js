@@ -46,8 +46,10 @@ module.exports.run = async(bot, message, args) => {
 module.exports.help = {
     name: "bot-ban",
     description: "BOT OWNER ONLY! Bans a user from the bot.",
+    args: "[@user/userID]",
     modCommand: false,
-    botOwner: true
+    botOwner: true,
+    utillity: false,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

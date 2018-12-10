@@ -8,18 +8,33 @@ bot.commands = new Discord.Collection();
 const botconfig = require('./botconfig.json');
 const guildSettings = require('./guildSettings.json');
 const members = require('./members.json');
+const levelSystem = require('./levelSystem.js');
+const SQLite = require("better-sqlite3");
+const sql = new SQLite('./scores.sqlite');
+let cooldown = new Set();
+var moment = require('moment');
 
 const fs = require('fs');
 
 const botName = "adprev";
 
 console.log("Starting bot...");
+console.log("Setting start time...");
+try {
+    botconfig.date = Date.now();
+    console.log("Successfully set startup date");
+} catch (error) {
+    console.log("Failed to set startup date");
+}
 
 fs.readdir("./commands/", (err, files) => {
+
+    console.log("Loading commands...");
 
     if(err) console.log(err);
 
     let jsfile = files.filter(f => f.split(".").pop() === "js");
+
     if (jsfile.length <= 0) {
 
         bot.destroy();
@@ -31,35 +46,12 @@ fs.readdir("./commands/", (err, files) => {
 
         let props = require(`./commands/${f}`);
 
-        console.log(`command ${f} loaded!`);
+        console.log(`Command ${f} Loaded!`);
         bot.commands.set(props.help.name, props)
 
     });
-
+    console.log("Commands loaded!")
 });
-
-// fs.readdir("./dmcommands/", (err, files) => {
-
-//     if(err) console.log(err);
-
-//     let jsfile = files.filter(f => f.split(".").pop() === "js");
-//     if (jsfile.length <= 0) {
-
-//         bot.destroy();
-//         return console.log("FATAL! Error loading commands!");
-
-//     }
-    
-//     files.forEach((f, i) => {
-
-//         let dmprops = require(`./dmcommands/${f}`);
-
-//         console.log(`command ${f} loaded!`);
-//         bot.dmcommands.set(props.help.name, dmprops)
-
-//     });
-
-// });
 
 bot.on('ready', async() => {
 
@@ -69,20 +61,24 @@ bot.on('ready', async() => {
     let guildSize = `${bot.guilds.size}`;
 
     setInterval(function(){
-		
+        
+        let keys = Object.keys(members);
+        
         if (setBotActivity == undefined) {
 
             setBotActivity = `Mention me!`;
 
         } else if (setBotActivity == `Mention me!`) {
 
+            setBotActivity = `over ${keys.length} members`
+
+        } else if (setBotActivity == `over ${keys.length} members`) {
+
             setBotActivity = `over ${bot.guilds.size} guilds!`;
 
         } else {
 
             setBotActivity = `Mention me!`;
-
-            
 
         }
 
@@ -103,13 +99,12 @@ bot.on('ready', async() => {
 
             guildSettings[keyArray[i]] = {
 
-                prefix: '!!',
+                prefix: 'k!',
                 channel: 'none',
                 ban: false,
                 actionMessage: true,
                 isPremium: false,
-                banMessage: "An advertising bot has been banned!",
-
+                banMessage: "An advertising bot has been banned!",y
         
 
             }
@@ -128,7 +123,7 @@ bot.on('guildCreate', (guild) => {
 
         guildSettings[guild.id] = {
 
-            prefix: '!!',
+            prefix: 'k!',
             channel: 'none',
             ban: false,
             actionMessage: true,
@@ -166,120 +161,27 @@ bot.on('guildMemberAdd', (member) => {
 
 bot.on('message', (message) => {
 
-    const args1 = message.content.slice(0).trim().split(/ +/g);
-    const messageLow = message.content.toLowerCase();
-
-    if (message.content.startsWith("setServer") && message.author.id == 365452203982323712){
-
-        if (!args1[1]) return message.author.send("Dewi, you forgot to give me the server ID...");
-        if (isNaN(args1[1])) return message.author.send("I can't set the server if the ID is not a number Dewi...");
-        if (args1[2]) return message.author.send("Hey Dewi, i dont need more then 1 argument...");
-
-        botconfig.server = args1[1];
-
-        
-        message.author.send("Changed server to: " + args1[1]);
-
-        fs.writeFile("./botconfig.json", JSON.stringify(botconfig), (err) => {
-            if (err) console.log(err);
-        });
-
-    }
-    if (message.content.startsWith("setChannel") && message.author.id == 365452203982323712){
-
-        if (!args1[1]) return message.author.send("Dewi, you forgot to give me the server channel...");
-        if (args1[2]) return message.author.send("Yo Dewi, i dont need more then 1 argument...");
-
-        botconfig.channel = args1[1];
-
-        message.author.send("Changed channel to: " + args1[1]);
-
-        fs.writeFile("./botconfig.json", JSON.stringify(botconfig), (err) => {
-            if (err) console.log(err);
-        });
-
-    }
-
-    if (message.content.startsWith("toggleOnOff") && message.author.id == 365452203982323712) {
-
-        if (botconfig.forwardMessages == true) {
-
-            botconfig.forwardMessages = false;
-            message.channel.send("Disabled message forwarding!");
-
-        } else {
-
-            botconfig.forwardMessages = true;
-            message.channel.send("Enabled message forwarding");
-
-        }
-
-        fs.writeFile("./botconfig.json", JSON.stringify(botconfig), (err) => {
-            if (err) console.log(err);
-        });
-    }
-
-    // Forward DM messages to specified channel.
-    if (message.channel.type == "dm" && message.author.id == 365452203982323712){
-
-        if (message.content.startsWith("setChannel") || message.content.startsWith("setServer") || message.content.startsWith("toggleOnOff")) return;
-
-        if (botconfig.forwardMessages == true) {
-            
-            let server = bot.guilds.get(botconfig.server);
-
-            if (server == undefined) return message.channel.send("The server ID is invalid, or i am not a member of that server.");
-            if (server.channels.find('name', botconfig.channel) == undefined) return message.channel.send("The channel name is invalid, i could not find it.");
-
-            server.channels.find('name', botconfig.channel).send(message.content);
-            
-
-        } else {
-            return;
-        }
-
-    }
-    
+    if (bot.user.username == "Kōkoku nashi Dev Build" && message.author.id != 365452203982323712) return;
+   
     // Check if channel type is DM.
     if (message.channel.type == "dm") return;
 
-    // Forward messages to Asuna#1000.
-    if (botconfig.forwardMessages == true && message.author.id != 503687810885353472 && message.guild.id == botconfig.server) {
-
-        if (!message.content) return;
-
-        let embed = new Discord.RichEmbed()
-        .setTitle("#"+message.channel.name)
-        .addField(message.author.tag, message.content)
-        .setColor(getRandomColor())
-        .setAuthor(message.guild.name)
-        .setFooter("Server ID: " + message.guild.id + " || user ID: " + message.author.id)
-
-        bot.fetchUser("365452203982323712").then(user => user.send(embed));
+    // Make sure the bot doesnt respond to it's own messages.
+    if (message.author.id == 503687810885353472){
+        return;
     }
 
     // New member profile creation
-    if (!members[message.author.id]) {
-
-        members[message.author.id] = {
-
-            isBanned: false,
-            level: 0,
-            exp: 0,
-            
-        }
-        fs.writeFile("./members.json", JSON.stringify(members), (err) => {
-            if (err) console.log(err);
-        });
-    }
+    levelSystem.run(bot, message)
 
     // Check if the guild has a config file, just to be safe.
+
     if (!guildSettings[message.guild.id]) {
 
         // If it doesnt, give it one.
         guildSettings[message.guild.id] = {
 
-            prefix: '!!',
+            prefix: 'k!',
             channel: 'none',
             ban: false,
             actionMessage: true,
@@ -298,11 +200,8 @@ bot.on('message', (message) => {
         return;
     }
 
-    // Make sure the bot doesnt respond to it's own messages.
     let channel = bot.channels.find('name', guildSettings[message.guild.id].channel);
-    if (message.author.id == 503687810885353472){
-        return;
-    }
+
 
     // Check for banned tags in a message
     if (message.channel == channel && guildSettings[message.guild.id].channel != 'none' && message.author.bot ) {
@@ -339,7 +238,27 @@ bot.on('message', (message) => {
 
     // if a command is registered and the message starts with the prefix, run the command.
     if (command && message.content.startsWith(prefix)) {
-        
+
+        // Check if a user recently used a command
+        if (cooldown.has(message.author.id)) {
+
+            message.delete();
+
+            return message.channel.send("**Error!** Please wait 5 seconds between commands!").then(message => message.delete(5000));
+        }
+
+
+        if (message.author.id != 365452203982323712) {
+            cooldown.add(message.author.id);
+            setTimeout(() => {
+    
+                cooldown.delete(message.author.id);
+    
+            }, 5000)
+        }
+        if (!members[message.author.id].isBanned){
+            members[message.author.id].isBanned = false;
+        }
         if (members[message.author.id].isBanned == true) {
 
             return message.channel.send("**Error!** You are banned from using this bot!");
@@ -349,32 +268,11 @@ bot.on('message', (message) => {
             let commandFile = bot.commands.get(command);
             if (!commandFile) return message.channel.send("**Error!** Unknown command!")
             commandFile.run(bot, message, args);
-        
+
         }
     }
     
-    //SEND MESSAGE DM
-    //SEND MESSAGE DM
-    //SEND MESSAGE DM
-    if (messageLow.includes("kokoku") || messageLow.includes("nashi")|| messageLow.includes("kōkoku")) {
 
-        if (members[message.author.id].isBanned) {
-            return message.channel.send("**Error!** You are banned from using this bot!");
-        } else {
-
-            if (botconfig.server == message.guild.id && botconfig.forwardMessages == true) return;
-
-            let embed = new Discord.RichEmbed()
-            .setTitle("#"+message.channel.name)
-            .addField(message.author.tag, message.content)
-            .setColor(getRandomColor())
-            .setAuthor(message.guild.name)
-            .setFooter("Server ID: " + message.guild.id + " || user ID: " + message.author.id)
-
-            bot.fetchUser("365452203982323712").then(user => user.send(embed));
-        
-        }
-    }
 
     if (message.mentions.members.first()) {
 
@@ -394,7 +292,11 @@ bot.on('message', (message) => {
 bot.on('error', error =>{
 
     console.error
-    bot.fetchUser("365452203982323712").channel.send("**Error!** Bot error! \n" + error ).catch(err => {if (err) console.log(err);});
+    bot.fetchUser("365452203982323712").then(user => {
+
+        user.channel.send("**Error!** Bot error! \n" + error ).catch(err => {if (err) console.log(err);});
+
+    })
 
 });
 
@@ -479,4 +381,4 @@ setInterval(function(){
     
 }, 36000000);
 
-bot.login(botconfig.token2);
+bot.login(botconfig.token1);

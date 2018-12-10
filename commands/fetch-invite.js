@@ -32,7 +32,8 @@ module.exports.run = async(bot, message, args) => {
 
 module.exports.help = {
     name: "fetch-invite",
-    description: "BOT OWNER ONLY! Unbans a user from the bot",
+    description: "BOT OWNER ONLY! Fetches a server, and returns an instant invite.",
+    args: "[ServerID]",
     modCommand: false,
     botOwner: true
 }

@@ -11,6 +11,7 @@ module.exports.run = async(bot, message, args) => {
 module.exports.help = {
     name: "invite",
     description: "Get bot invite link.",
+    args: "This command has no arguments",
     modCommand: false,
     botOwner: false
 }

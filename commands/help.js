@@ -32,54 +32,25 @@ module.exports.run = async(bot, message, args) => {
         
         message.channel.send(embed)
 
-    } else if (args[0] == "moderator") {
-
-        console.log("y")
-
-        for (i = 0; i < commands.length; i++) {
-
-            let getObject = bot.commands.get(commands[i])
-    
-            if(commands[i] == "help") {
-                
-            } else {
-                if (getObject.help.modCommand == false) {
-
-                } else {
-                    embed.addField(guildSettings[message.guild.id].prefix + getObject.help.name, getObject.help.description);
-                }
-            }
-        }
-
-        message.channel.send(embed);
-    }else if (args[0] == "owner") {
-
-        console.log("y")
-
-        for (i = 0; i < commands.length; i++) {
-
-            let getObject = bot.commands.get(commands[i])
-    
-            if(commands[i] == "help") {
-                
-            } else {
-                if (getObject.help.botOwner == false) {
-
-                } else {
-                    embed.addField(guildSettings[message.guild.id].prefix + getObject.help.name, getObject.help.description);
-                }
-            }
-        }
-
-        message.channel.send(embed);
     } else {
-        message.channel.send("**Error!** Unknown error!");
+
+        let commandFile = bot.commands.get(args[0]);
+        if (!commandFile) return message.channel.send("**Error!** Could not find command!");
+
+        let detailedEmbed = new Discord.RichEmbed()
+        .setTitle("Command help: " + args[0])
+        .setColor(getRandomColor())
+        .setDescription("Arguments enclosed in curly braces ( {} ) are OPTIONAL!\nArguments enclosed in square brackets ( [] ) are REQUIRED! \n\n" + commandFile.help.description)
+        .addField("Usage", guildSettings[message.guild.id].prefix + args[0] + " " + commandFile.help.args)
+
+        message.channel.send(detailedEmbed);
     }
 }
 
 module.exports.help = {
     name: "help",
     description: "The help command.",
+    args: "{Command}",
     modCommand: false,
     botOwner: false
 }

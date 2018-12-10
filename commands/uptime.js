@@ -29,7 +29,8 @@ module.exports.run = async(bot, message, args) => {
 
 module.exports.help = {
     name: "uptime",
-    description: "Get the bot-uptime",
+    description: "Get the bot-uptime.",
+    args: "This command has no arguments.",
     modCommand: false,
     botOwner: false
 }

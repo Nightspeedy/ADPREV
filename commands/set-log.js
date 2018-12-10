@@ -17,13 +17,13 @@ module.exports.run = async(bot, message, args) => {
         save();
 
     } else {
-        message.channel.send("**Error!** You do not have permission to execute this command!");
     }
 
 }
 module.exports.help = {
     name: "set-logchannel",
     description: "Sets the logging channel. (Only commands of this bot get logged at this moment)   ",
+    args: "[#channel]",
     modCommand: true,
     botOwner: false
 }

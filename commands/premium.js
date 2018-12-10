@@ -10,10 +10,10 @@ module.exports.run = async(bot, message, args) => {
         
         if (args[0] == "true"){
             guildSettings[message.guild.id].isPremium = true;
-            message.channel.send("This server is now using ADPREV Premium.");
+            message.channel.send("This server is now using " + bot.user.username + " Premium.");
         } else if (args[0] == "false") {
             guildSettings[message.guild.id].isPremium = false;
-            message.channel.send("This server is no longer using ADPREV Premium.");
+            message.channel.send("This server is no longer using " + bot.user.username + " Premium.");
         }
 
     } else {
@@ -26,6 +26,7 @@ module.exports.run = async(bot, message, args) => {
 module.exports.help = {
     name: "premium",
     description: "BOT OWNER ONLY! Sets the premium status of a server.",
+    args: "[true/false]",
     modCommand: false,
     botOwner: true
 }
