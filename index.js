@@ -1,18 +1,16 @@
-const commando = require('discord.js-commando');
 const Discord = require('discord.js');
 const bot = new Discord.Client({
     unknownCommandResponse: false
 });
 bot.commands = new Discord.Collection();
-//bot.dmcommands = new Discord.Collection();
 const botconfig = require('./botconfig.json');
 const guildSettings = require('./guildSettings.json');
 const members = require('./members.json');
 const levelSystem = require('./levelSystem.js');
-let cooldown = new Set();
-var moment = require('moment');
-
+const moment = require('moment');
 const fs = require('fs');
+let cooldown = new Set();
+
 
 console.log("Starting bot...");
 console.log("Setting start time...");
