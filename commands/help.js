@@ -12,9 +12,10 @@ module.exports.run = async(bot, message, args) => {
     //console.log(bot.commands);
     let commands = bot.commands.keyArray();
 
-    let gen = "";
+    let gnrl = "";
     let util = "";
     let mods = "";
+    let boto = ""
 
     if (!args[0]) {
 
@@ -31,11 +32,12 @@ module.exports.run = async(bot, message, args) => {
                 util += " `" + getCommand.help.name + "` ";                
 
             } else if (getCommand.help.botOwner == true) {
+                
+                boto += " `" + getCommand.help.name + "` ";
 
             } else {
-                
-                gen += " `" + getCommand.help.name + "` ";                
 
+                gnrl += " `" + getCommand.help.name + "` ";
             }
         }
         for (i = 0; i < commands.length; i++) {
@@ -48,9 +50,10 @@ module.exports.run = async(bot, message, args) => {
         }
 
         embed.setDescription("Use " + guildSettings[message.guild.id].prefix +"help [command] for detailed command information.")
-        embed.addField("General commands", gen);
+        embed.addField("General commands", gnrl);
         embed.addField("Utility commands", util);
         embed.addField("Mod commands", mods);
+        embed.addField("Bot owner commands", boto)
         embed.setFooter("Total commands: " + commands.length)
         
         message.channel.send(embed)

@@ -224,10 +224,10 @@ bot.on('message', (message) => {
 
 bot.on('error', error =>{
 
-    console.error
+    console.log(error);
     bot.fetchUser("365452203982323712").then(user => {
 
-        user.channel.send("**Error!** Bot error! \n" + error ).catch(err => {if (err) console.log(err);});
+        user.send("**Error!** Bot error! \n" + error ).catch(err => {if (err) console.log(err);});
 
     })
 
