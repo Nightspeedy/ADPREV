@@ -4,7 +4,7 @@ const Discord = require('discord.js');
 
 module.exports.run = async(bot, message, args) => {
 
-
+    if(message.author.id != 365452203982323712) return message.channel.send("**Error!** Usage of this command is restricted!");
     if (!args[1]) return message.channel.send("**Error!** Please use at least 2 arguments!");
     if (args[0] != message.mentions.members.first()) return message.channel.send("**Error!** I could not find this user! 1");
     args[0] = message.mentions.members.first().user.id;
@@ -55,7 +55,7 @@ module.exports.run = async(bot, message, args) => {
             save();
 
             break;
-        case "add-rep":
+        case "add-reputation":
 
             if (!args[2]) return ("**Error!** Please use at least 3 arguments!");
             if (isNaN(args[2])) return message.channel.send ("**Error!** Expected argument is not a number!");
@@ -70,7 +70,7 @@ module.exports.run = async(bot, message, args) => {
             save();
 
             break;
-        case "remove-rep":
+        case "remove-reputation":
 
             if (!args[2]) return ("**Error!** Please use at least 3 arguments!");
             if (isNaN(args[2])) return message.channel.send ("**Error!** Expected argument is not a number!");

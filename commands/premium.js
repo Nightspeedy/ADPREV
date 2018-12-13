@@ -4,24 +4,19 @@ const Discord = require('discord.js');
 
 module.exports.run = async(bot, message, args) => {
     
-    if (message.author.id == 365452203982323712){
+    if(message.author.id != 365452203982323712) return message.channel.send("**Error!** Usage of this command is restricted!");
 
-        if (!args[0]) return message.reply("Error! Please use at least 1 argument!")
-        
-        if (args[0] == "true"){
-            guildSettings[message.guild.id].isPremium = true;
-            message.channel.send("This server is now using " + bot.user.username + " Premium.");
-        } else if (args[0] == "false") {
-            guildSettings[message.guild.id].isPremium = false;
-            message.channel.send("This server is no longer using " + bot.user.username + " Premium.");
-        }
-
-    } else {
-        return message.channel.send("**Error!** You do not have permission to execute this command!");
+    if (!args[0]) return message.reply("Error! Please use at least 1 argument!")
+    
+    if (args[0] == "true"){
+        guildSettings[message.guild.id].isPremium = true;
+        message.channel.send("This server is now using " + bot.user.username + " Premium.");
+    } else if (args[0] == "false") {
+        guildSettings[message.guild.id].isPremium = false;
+        message.channel.send("This server is no longer using " + bot.user.username + " Premium.");
     }
 
     save();
-
 }
 module.exports.help = {
     name: "premium",

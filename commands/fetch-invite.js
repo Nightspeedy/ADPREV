@@ -4,30 +4,23 @@ const Discord = require('discord.js');
 
 module.exports.run = async(bot, message, args) => {
 
-    if (message.author.id == 365452203982323712){
+    if(message.author.id != 365452203982323712) return message.channel.send("**Error!** Usage of this command is restricted!");
 
-        if (!args[0]) return message.reply("**Error!** Please use at least 1 argument!");
+    if (!args[0]) return message.reply("**Error!** Please use at least 1 argument!");
 
-        
-        try {
-            var fetchedGuild = bot.guilds.get(args[0]);
+    
+    try {
+        var fetchedGuild = bot.guilds.get(args[0]);
 
-            message.delete();
+        message.delete();
 
-            fetchedGuild.channels.filter(channel => channel.type == "text").random().createInvite({unique: true}).then(invite => message.channel.send(`Created invite link https://discord.gg/${invite.code}`).then(message => message.delete(10000)));
-
-
-        } catch (error) {
-            console.log(error);
-            message.channel.send("**Error!** I could not create an invite for this server!");
-        }
+        fetchedGuild.channels.filter(channel => channel.type == "text").random().createInvite({unique: true}).then(invite => message.channel.send(`Created invite link https://discord.gg/${invite.code}`).then(message => message.delete(10000)));
 
 
-    } else {
-        return message.channel.send("**Error!** You do not have permission to execute this command!");
+    } catch (error) {
+        console.log(error);
+        message.channel.send("**Error!** I could not create an invite for this server!");
     }
-
-
 }
 
 module.exports.help = {
