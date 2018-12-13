@@ -29,35 +29,34 @@ module.exports.run = async(bot, message, args) => {
 
         }, 43200000);
 
-    } else if (args[0] == message.mentions.members.first()) {
+    } else if (args[0]) {
 
         // Gift by mention
-
-        if (message.mentions.members.first().user.bot) return message.channel.send("**Error!** Target user is a bot!");
-        if (message.author.id == message.mentions.members.first().user.id) return message.channel.send("**Error!** You cannot gift yourself coins! Use " + guildSettings[message.guild.id].prefix + "daily instead!");
-
-        let randomExtra = Math.floor(Math.random() * 200 + 201);
-
-        const embed = new Discord.RichEmbed()
-        .setTitle(message.author.username)
-        .setColor(getRandomColor())
-        .addField("You gifted your daily credits!",  randomExtra + " credits were added to "+ message.mentions.members.first().user.username +"'s account!")
-
-        members[message.mentions.members.first().user.id].credits = members[message.mentions.members.first().user.id].credits + randomExtra;
-
-        message.channel.send(embed);
-
-        cooldown.add(message.author.id)
-        
-        setTimeout(() => {
+        if (message.mentions.members.first()) {
             
-            cooldown.delete(message.author.id);
-
-        }, 43200000);
-
-    } else {
-
-        // Gift by ID
+            if (message.mentions.members.first().user.bot) return message.channel.send("**Error!** Target user is a bot!");
+            if (message.author.id == message.mentions.members.first().user.id) return message.channel.send("**Error!** You cannot gift yourself coins! Use " + guildSettings[message.guild.id].prefix + "daily instead!");
+    
+            let randomExtra = Math.floor(Math.random() * 200 + 201);
+    
+            const embed = new Discord.RichEmbed()
+            .setTitle(message.author.username)
+            .setColor(getRandomColor())
+            .addField("You gifted your daily credits!",  randomExtra + " credits were added to "+ message.mentions.members.first().user.username +"'s account!")
+    
+            members[message.mentions.members.first().user.id].credits = members[message.mentions.members.first().user.id].credits + randomExtra;
+    
+            message.channel.send(embed);
+    
+            cooldown.add(message.author.id)
+            
+            setTimeout(() => {
+                
+                cooldown.delete(message.author.id);
+    
+            }, 43200000);
+        } else {
+                    // Gift by ID
 
         if (!members[args[0]]) return message.channel.send("**Error!** I could not find this user!");
         if (message.author.id == args[0]) return message.channel.send("**Error!** You cannot gift yourself coins! Use " + guildSettings[message.guild.id].prefix + "daily instead!");
@@ -90,6 +89,12 @@ module.exports.run = async(bot, message, args) => {
             if(err) console.log(err);
 
         });
+        }
+
+
+    } else {
+
+        message.channel.send("**Error!** Unknown error!");
 
     }
 

@@ -7,6 +7,7 @@ const botconfig = require('./botconfig.json');
 const guildSettings = require('./guildSettings.json');
 const members = require('./members.json');
 const levelSystem = require('./levelSystem.js');
+const forwarding = require('./forwarding.js');
 const moment = require('moment');
 const fs = require('fs');
 let cooldown = new Set();
@@ -86,6 +87,8 @@ bot.on('ready', async() => {
 
     let keyArray = bot.guilds.keyArray();
 
+
+    // check if all servers have a configuration
     for (i = 0; i < keyArray.length; i++) {
         
         if (!guildSettings[keyArray[i]]) {
@@ -93,12 +96,8 @@ bot.on('ready', async() => {
             guildSettings[keyArray[i]] = {
 
                 prefix: 'k!',
-                channel: 'none',
-                ban: false,
-                actionMessage: true,
-                isPremium: false,
-                banMessage: "An advertising bot has been banned!",y
-        
+                logChannel: undefined,
+                isPremium: false,  
 
             }
             console.log("Created object for: " + keyArray[i])
@@ -117,7 +116,7 @@ bot.on('guildCreate', (guild) => {
         guildSettings[guild.id] = {
 
             prefix: 'k!',
-            channel: 'none',
+            logChannel: undefined,
             isPremium: false,
 
         }
@@ -147,60 +146,16 @@ bot.on('message', (message) => {
 
     if (bot.user.username == "Kōkoku nashi Dev Build" && message.author.id != 365452203982323712) return;
    
+    forwarding.run(bot, message);
+
     // Check if channel type is DM.
     if (message.channel.type == "dm") return;
 
     // Make sure the bot doesnt respond to it's own messages.
-    if (message.author.id == 503687810885353472){
-        return;
-    }
+    if (message.author.id == 503687810885353472) return;
 
-    // New member profile creation
+    // Level system.
     levelSystem.run(bot, message)
-
-    // Check if the guild has a config file, just to be safe.
-
-    if (!guildSettings[message.guild.id]) {
-
-        // If it doesnt, give it one.
-        guildSettings[message.guild.id] = {
-
-            prefix: 'k!',
-            channel: 'none',
-            isPremium: false,
-
-        }
-
-        fs.writeFile("./guildSettings.json", JSON.stringify(guildSettings), (err) => {
-            if (err) console.log(err);
-        });
-        return;
-    }
-
-    let channel = bot.channels.find('name', guildSettings[message.guild.id].channel);
-
-
-    // Check for banned tags in a message
-    if (message.channel == channel && guildSettings[message.guild.id].channel != 'none' && message.author.bot ) {
-
-        let mentioned = "null";
-
-        if (message.mentions.members.first()) {
-
-            mentioned = String(message.mentions.members.first().user.username);
-
-        }
-        for (i = 0; i <= botconfig.bannedTags.length; i++){
-
-            if (message.content.includes(botconfig.bannedTags[i]) || mentioned.includes(botconfig.bannedTags[i])){
-                
-                message.delete();
-                console.log("Message deleted!");
-
-                return;
-            }
-        }
-    }
     
     // Some command mumbo-jumbo.
     const prefix = guildSettings[message.guild.id].prefix;
@@ -251,6 +206,7 @@ bot.on('message', (message) => {
         }
     }
     
+    // Check if the bot is mentioned, and send a help message
     if (message.mentions.members.first()) {
 
                 
@@ -276,35 +232,5 @@ bot.on('error', error =>{
     })
 
 });
-
-function getRandomColor() {
-    let letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-}
-
-function save(){
-    fs.writeFile("./guildSettings.json", JSON.stringify(guildSettings), (err) => {
-        if (err) console.log(err);
-    });
-}
-
-let timesSaved = 0
-setInterval(function(){
-
-    fs.writeFile("./botconfig.json", JSON.stringify(botconfig), (err) => {
-        if (err) console.log(err);
-    });
-    fs.writeFile("./guildSettings.json", JSON.stringify(guildSettings), (err) => {
-        if (err) console.log(err);
-    });
-    
-    timesSaved++
-    console.log("Saved any file changes, Saved: " + timesSaved + " times!");
-    
-}, 36000000);
 
 bot.login(botconfig.token1);
