@@ -11,6 +11,7 @@ module.exports.run = async(bot, message, args) => {
 
         const embed = new Discord.RichEmbed()
         .setTitle(message.author.username + "'s Profile")
+        .setThumbnail(message.author.displayAvatarURL)
         .setColor(getRandomColor())
         .addField("Level", members[message.author.id].level)
         .addField("Next level progress", members[message.author.id].exp + "/" + nxtLvl + " Exp")
@@ -28,6 +29,7 @@ module.exports.run = async(bot, message, args) => {
 
         const embed = new Discord.RichEmbed()
         .setTitle(message.mentions.members.first().user.username + "'s Profile")
+        .setThumbnail(message.mentions.members.first().user.displayAvatarURL)
         .setColor(getRandomColor())
         .addField("Level", members[message.mentions.members.first().user.id].level)
         .addField("Next level progress", members[message.mentions.members.first().user.id].exp + "/" + nxtLvl + " Exp")
@@ -48,6 +50,7 @@ module.exports.run = async(bot, message, args) => {
 
             const embed = new Discord.RichEmbed()
             .setTitle(user.username + "'s Profile")
+            .setThumbnail(user.displayAvatarURL)
             .setColor(getRandomColor())
             .addField("Level", members[user.id].level)
             .addField("Next level progress", members[user.id].exp + "/" + nxtLvl)

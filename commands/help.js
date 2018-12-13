@@ -32,20 +32,12 @@ module.exports.run = async(bot, message, args) => {
                 util += " `" + getCommand.help.name + "` ";                
 
             } else if (getCommand.help.botOwner == true) {
-                
+
                 boto += " `" + getCommand.help.name + "` ";
 
             } else {
 
                 gnrl += " `" + getCommand.help.name + "` ";
-            }
-        }
-        for (i = 0; i < commands.length; i++) {
-
-            let getCommand = bot.commands.get(commands[i])
-
-            if (getCommand.help.botOwner == true) {
-                commands.splice(i, 1)
             }
         }
 
