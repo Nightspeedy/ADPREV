@@ -1,10 +1,9 @@
-const members = require('./../members.json');
 const fs = require('fs');
 const botconfig = require('../botconfig.json');
 const Discord = require('discord.js');
 
 
-module.exports.run = async(bot, message, args) => {
+module.exports.run = async(bot, message, args, members) => {
 
     if (!args[0]) return message.channel.send("**Error!** Please use at least 1 argument!");
     if (args[1]) return message.channel.send("**Error!** Too many arguments. 1 expected, got " + args.length);
@@ -16,28 +15,29 @@ module.exports.run = async(bot, message, args) => {
 
     if (args[0] == "levels") {
 
-        let a = Object.keys(members).sort((a,b)=>members[b].level - members[a].level);
+        //let a = Object.keys(members).sort((a,b)=>members[b].level - members[a].level);
+
+        let a = await members.findAll({ attributes: ['id', 'level']});
+        a.sort((a,b) => b.level - a.level);
+
 
         embed.setTitle("Top 10 ranking: Level");
 
-        for (i = 0; i < a.length; i++) {
-
-
-            if (i < 10) {
-                const user = await bot.fetchUser(a[i]);
-
-                embed.addField("#" +(i+1)+ " " + user.tag, "Level: " + members[a[i]].level);
-
+        for(let i = 0; i < a.length; i++) {
+            if  (i < 10) {
+                const user = await bot.fetchUser(a[i].dataValues.id);
+                console.log(user);
+                embed.addField(`#${i+1} ${user.tag}`, `Level: ${a[i].dataValues.level}`);
             } else {
-                
+                return message.channel.send(embed);
             }
-
         }
-        message.channel.send(embed);
+
 
     } else if (args[0] == "credits"){
 
-        let b = Object.keys(members).sort((a,b)=>members[b].credits - members[a].credits);
+        let b = await members.findAll({ attributes: ['id', 'credits']});
+        b.sort((a,b) => b.credits - a.credits);
 
         embed.setTitle("Top 10 ranking: Credits");
 
@@ -45,20 +45,19 @@ module.exports.run = async(bot, message, args) => {
 
 
             if (i < 10) {
-                const user = await bot.fetchUser(b[i]);
+                const user = await bot.fetchUser(b[i].dataValues.id);
 
-                embed.addField("#" +(i+1)+ " " + user.tag, "Credits: " + members[b[i]].credits);
+                embed.addField(`#${i+1} ${user.tag}`, `Credits: ${b[i].dataValues.credits}`);
 
             } else {
-                
-            }
-
+            }  
         }
-        message.channel.send(embed);
+        return message.channel.send(embed); 
 
     } else if (args[0] == "reputation") {
 
-        let c = Object.keys(members).sort((a,b)=>members[b].reputation - members[a].reputation);
+        let c = await members.findAll({ attributes: ['id', 'reputation']});
+        c.sort((a,b) => b.reputation - a.reputation);
 
         embed.setTitle("Top 10 ranking: Reputation");
 
@@ -66,16 +65,13 @@ module.exports.run = async(bot, message, args) => {
 
 
             if (i < 10) {
-                const user = await bot.fetchUser(c[i]);
+                const user = await bot.fetchUser(c[i].dataValues.id);
 
-                embed.addField("#" +(i+1)+ " " + user.tag, "Reputation: " + members[c[i]].reputation);
-
-            } else {
-                
+                embed.addField(`#${i+1} ${user.tag}`, `Reputation: ${c[i].dataValues.reputation}`);
+            } else {   
             }
-
         }
-        message.channel.send(embed);
+        return message.channel.send(embed);
 
     } else {
         return message.channel.send("**Error!** Invalid argument!");

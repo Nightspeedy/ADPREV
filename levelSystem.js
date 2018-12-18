@@ -1,97 +1,69 @@
-const members = require('./members.json');
 const fs = require('fs');
 const botconfig = require('./botconfig.json');
 const Discord = require('discord.js');
 let cooldown = new Set();
 
-module.exports.run = async(bot, message) => {
+module.exports.run = async(bot, message, members) => {
 
     if(message.author.bot) return;
+    
+    //Check for the user's data
+    await members.findOrCreate({ where: { id: message.author.id }, defaults: {
+        id: message.author.id,
+        isBanned: false,
+        level: 1,
+        exp: 0,
+        reputation: 0,
+        credits: 0,
+    }}).spread( async(result, isCreated) => {
 
-    if (!members[message.author.id]) {
+        if(!isCreated) {
 
-        // generate user profile if none exists
-        members[message.author.id] = {
+            // check cooldown
+            if (cooldown.has(message.author.id)) return;
 
-            isBanned: false,
-            level: 1,
-            exp: 0,
-            reputation: 0,
-            credits: 0,
-            
+            // add someone to cooldown
+            cooldown.add(message.author.id);
+        
+            // set cooldown
+        
+        
+            // check if user is banned, if banned, return
+            if (result.dataValues.isBanned == true) return;
+        
+            // set all levelup variables
+            let randomExp = Math.floor(Math.random() * 20 + 11);
+            let randomCre = Math.floor(Math.random() * 4 + 1);
+        
+            let nxtLvl = result.dataValues.level * botconfig.level;
+
+            let exp = result.dataValues.exp + randomExp;
+            let credits = result.dataValues.credits + randomCre;
+        
+            // add random EXP to user's current EXP
+            await members.update({exp: exp, credits: credits,}, {where: { id: message.author.id}});
+        
+            // if user has more EXP then needed, level them up
+            if (result.dataValues.exp >= nxtLvl){
+        
+                let level = result.dataValues.level + 1;
+                result.dataValues.exp = 0;
+        
+                let embed = new Discord.RichEmbed()
+                .setTitle("Level up!")
+                .setColor(getRandomColor())
+                .addField(message.author.username + " Leveled up!", "You are now level " + level);
+        
+                message.channel.send (embed);
+        
+                await members.update({exp: exp, level: level}, {where: { id: message.author.id}});
+        
+            }
+            setTimeout(() => {
+                cooldown.delete(message.author.id);
+            }, 60000);
         }
-        fs.writeFile("./members.json", JSON.stringify(members), (err) => {
-            if (err) console.log(err);
-        });
-    }
-
-    // check cooldown
-    if (cooldown.has(message.author.id)) return;
-
-    // add someone to cooldown
-    cooldown.add(message.author.id);
-
-    // set cooldown
-
-
-    // check if user is banned, if banned, return
-    if (members[message.author.id].isBanned) return;
-
-    // check if user has all properties
-    if (!members[message.author.id].isBanned) {
-        members[message.author.id].isBanned = false;
-        save();
-    }
-    if (!members[message.author.id].level) {
-        members[message.author.id].level = 1;
-        save();
-    }
-    if (!members[message.author.id].exp) {
-        members[message.author.id].exp = 0;
-        save();
-    }
-    if (!members[message.author.id].reputation) {
-        members[message.author.id].reputation = 0;
-        save();
-    }
-    if (!members[message.author.id].credits) {
-        members[message.author.id].credits = 0;
-    }
-
-    // set all levelup variables
-    let level = members[message.author.id].level;
-    let exp = members[message.author.id].exp;
-    let randomExp = Math.floor(Math.random() * 20 + 11);
-    let randomCre = Math.floor(Math.random() * 4 + 1);
-    let nxtLvl = level * botconfig.level;
-
-    // add random EXP to user's current EXP
-    members[message.author.id].exp = members[message.author.id].exp + randomExp;
-    members[message.author.id].credits = members[message.author.id].credits + randomCre;
-
-
-    // Save file
-    save();
-
-    // if user has more EXP then needed, level them up
-    if (exp >= nxtLvl){
-
-        members[message.author.id].level = members[message.author.id].level + 1;
-        members[message.author.id].exp = 0;
-
-        let embed = new Discord.RichEmbed()
-        .setTitle("Level up!")
-        .setColor(getRandomColor())
-        .addField(message.author.username + " Leveled up!", "You are now level " + members[message.author.id].level);
-
-        message.channel.send (embed)
-
-        // Save file
-        save();
-    }
-    setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 60000)
+    });
 }
 
 

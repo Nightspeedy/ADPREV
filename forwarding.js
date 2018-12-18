@@ -1,4 +1,3 @@
-const members = require('./members.json');
 const fs = require('fs');
 const forwarding = require('./forwarding.json');
 const Discord = require('discord.js');

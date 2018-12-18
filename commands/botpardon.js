@@ -1,31 +1,34 @@
-const members = require('./../members.json');
 const fs = require('fs');
 const Discord = require('discord.js');
 
-module.exports.run = async(bot, message, args) => {
+module.exports.run = async(bot, message, args, members) => {
 
     if(message.author.id != 365452203982323712) return message.channel.send("**Error!** Usage of this command is restricted!");
 
     if (!args[0]) return message.channel.send("**Error!** Please use at least 1 argument!");
     if (args[1]) return message.channel.send("**Error!** Too many arguments. 1 expected, got " + args.length);
+
     if (message.mentions.members.first()) {
         args[0] = message.mentions.members.first().user.id;
     }
-    if (!members[args[0]]) return message.channel.send("**Error!** User does not exist in my database!")
 
-    if (members[args[0]].isBanned == true) {
+    await members.findOne({where: {id: args[0]}}).then( async(member) => {
 
-        members[args[0]].isBanned = false;
+        if (member.dataValues.isBanned == true) {
 
-        message.channel.send("User ID " + args[0] + " Has been pardoned. They can now use " + bot.user.username + " again.");
+            let isBanned = false;
+    
+            members.update({isBanned: isBanned}, {where: {id: args[0]}});
 
-        fs.writeFile("./members.json", JSON.stringify(members), (err) => {
-            if (err) console.log(err);
-        });
+            message.channel.send("User ID " + args[0] + " Has been pardoned. They can now use " + bot.user.username + " again.");
+    
+        } else {
+            message.channel.send("**Error!** User is not banned!");
+        }
 
-    } else {
-        message.channel.send("**Error!** User is not banned!");
-    }
+    }).catch(() => {
+        return message.channel.send("**Error!** User does not exist in my database!");
+    });
 }
 
 module.exports.help = {

@@ -1,8 +1,7 @@
-const members = require('./../members.json');
 const fs = require('fs');
 const Discord = require('discord.js');
 
-module.exports.run = async(bot, message, args) => {
+module.exports.run = async(bot, message, args, members) => {
 
     // Check if the caller is me, if it's not, return
     if(message.author.id != 365452203982323712) return message.channel.send("**Error!** Usage of this command is restricted!");
@@ -15,25 +14,23 @@ module.exports.run = async(bot, message, args) => {
         args[0] = message.mentions.members.first().user.id;
     }
 
-    if (args[0] == message.author.id) return message.channel.send("**Error!** You cannot ban yourself!");
-    if (!members[args[0]]) return message.channel.send("**Error!** User does not exist in my database!");
+    await members.findOne({where: {id: args[0]}}).then( async(member) => {
 
-    // Check if a user is already banned, return if they are.
-    if (members[args[0]].isBanned == false) {
+        if (member.dataValues.isBanned == false) {
 
-        members[args[0]].isBanned = true;
+            member.dataValues.isBanned = true;
+    
+            members.update({isBanned: isBanned}, {where: {id: args[0]}});
 
-        message.channel.send("User ID " + args[0] + " Has been banned from using " + bot.user.username );
+            message.channel.send("User ID " + args[0] + " Has been banned from using " + bot.user.username);
+    
+        } else {
+            message.channel.send("**Error!** User is already banned!");
+        }
 
-        fs.writeFile("./members.json", JSON.stringify(members), (err) => {
-            if (err) console.log(err);
-        })
-
-    } else {
-
-        message.channel.send("**Error!** User is already banned!");
-
-    }
+    }).catch(() => {
+        return message.channel.send("**Error!** User does not exist in my database!");
+    });
 }
 
 module.exports.help = {

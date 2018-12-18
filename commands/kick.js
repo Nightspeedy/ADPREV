@@ -1,5 +1,4 @@
 const guildSettings = require('./../guildSettings.json');
-const members = require('./../members.json');
 const fs = require('fs');
 const Discord = require('discord.js');
 

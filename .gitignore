@@ -3,3 +3,5 @@ package.json
 package-lock.json
 guildSettings.json
 members.json
+database.sqlite
+members.json-backup.txt

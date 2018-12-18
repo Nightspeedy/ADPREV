@@ -1,9 +1,8 @@
 const guildSettings = require('./../guildSettings.json');
-const members = require('./../members.json');
 const fs = require('fs');
 const Discord = require('discord.js');
 
-module.exports.run = async(bot, message, args) => {
+module.exports.run = async(bot, message, args, members) => {
 
     if (message.member.hasPermission("BAN_MEMBERS")) {
 

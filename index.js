@@ -5,16 +5,64 @@ const bot = new Discord.Client({
 bot.commands = new Discord.Collection();
 const botconfig = require('./botconfig.json');
 const guildSettings = require('./guildSettings.json');
-const members = require('./members.json');
 const levelSystem = require('./levelSystem.js');
 const forwarding = require('./forwarding.js');
+const Sequelize = require('sequelize');
 const moment = require('moment');
 const fs = require('fs');
 let cooldown = new Set();
 
-
 console.log("Starting bot...");
 console.log("Setting start time...");
+
+// dbase init
+console.log("Connecting to database...");
+const sequelize = new Sequelize('database', 'user', 'password', {
+    host: 'localhost',
+    dialect: 'sqlite',
+    logging: false,
+    operatorsAliases: false,
+    // SQLite only
+    storage: 'database.sqlite',
+});
+console.log("Successfully connected to database!");
+
+// Creating model
+const members = sequelize.define('Members', {
+    id: {
+        type: Sequelize.STRING,
+        unique: true,
+        allowNull: false,
+        primaryKey: true,
+    },
+    isBanned: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+    },
+    level: {
+        type: Sequelize.INTEGER,
+        defaultValue: 1,
+        allowNull: false,
+    },
+    exp: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
+    },
+    reputation: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
+    },
+    credits: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
+    },
+});
+
+
 try {
     botconfig.date = Date.now();
     console.log("Successfully set startup date");
@@ -48,7 +96,61 @@ fs.readdir("./commands/", (err, files) => {
     console.log("Commands loaded!");
 });
 
-bot.on('ready', async() => {
+bot.once('ready', async() => {
+
+    // Sync the database
+    await members.sync();
+
+    /////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////
+    ///////////////////////RUN/ONCE//////////////////////////
+    /////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////
+
+    // let doOnce = Object.keys(Members);
+
+    // for (let i = 0; i < doOnce.length; i++) {
+
+    //     if (!Members[doOnce[i]].isBanned) {
+    //         Members[doOnce[i]].isBanned = false;
+    //     }
+    //     if (!Members[doOnce[i]].level) {
+    //         Members[doOnce[i]].level = 1;
+    //     }
+    //     if (!Members[doOnce[i]].exp) {
+    //         Members[doOnce[i]].exp = 0;
+    //     }
+    //     if (!Members[doOnce[i]].reputation) {
+    //         Members[doOnce[i]].reputation = 0;
+    //     }
+    //     if (!Members[doOnce[i]].credits) {
+    //         Members[doOnce[i]].credits = 0;
+    //     }
+    //     try {
+    //         // equivalent to: INSERT INTO tags (name, descrption, username) values (?, ?, ?);
+    //         await members.create({
+    //             id: doOnce[i],
+    //             isBanned: Members[doOnce[i]].isBanned,
+    //             level: Members[doOnce[i]].level,
+    //             exp: Members[doOnce[i]].exp,
+    //             reputation: Members[doOnce[i]].reputation,
+    //             credits: Members[doOnce[i]].credits,
+    //         });
+    //         console.log(`User ID ${doOnce[i]} added.`);
+    //     }
+    //     catch (e) {
+    //         if (e.name === 'SequelizeUniqueConstraintError') {
+    //             console.log("This used already exists in the database!")
+    //         }
+    //         console.log(e)
+    //     }
+    // }
+
+    /////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////
 
     console.log(`${bot.user.username} Login succesfull!`);
 
@@ -57,17 +159,11 @@ bot.on('ready', async() => {
 
     setInterval(function(){
         
-        let keys = Object.keys(members);
-        
         if (setBotActivity == undefined) {
 
             setBotActivity = `Mention me!`;
 
         } else if (setBotActivity == `Mention me!`) {
-
-            setBotActivity = `over ${keys.length} members`
-
-        } else if (setBotActivity == `over ${keys.length} members`) {
 
             setBotActivity = `over ${guildSize} guilds!`;
 
@@ -138,11 +234,11 @@ bot.on('guildDelete', (guild) => {
 
 });
 
-bot.on('guildMemberAdd', (member) => {
+bot.on('guildMemberAdd', (i) => {
 
 });
 
-bot.on('message', (message) => {
+bot.on('message', async(message) => {
 
     if (bot.user.username == "Kōkoku nashi Dev Build" && message.author.id != 365452203982323712) return;
    
@@ -155,7 +251,7 @@ bot.on('message', (message) => {
     if (message.author.id == 503687810885353472) return;
 
     // Level system.
-    levelSystem.run(bot, message)
+    levelSystem.run(bot, message, members);
     
     // Some command mumbo-jumbo.
     const prefix = guildSettings[message.guild.id].prefix;
@@ -186,24 +282,24 @@ bot.on('message', (message) => {
             }, 5000)
         }
 
-        // Make sure the code doesnt break here...
-        if (!members[message.author.id].isBanned){
-            members[message.author.id].isBanned = false;
-        }
-
         // Check if a user is banned
-        if (members[message.author.id].isBanned == true) {
+        members.findOne({where: {id: message.author.id}}).then(member => {
 
-            return message.channel.send("**Error!** You are banned from using this bot!");
+            if (member.dataValues.isBanned == true) {
 
-        } else {
-            
-            // Run the command file
-            let commandFile = bot.commands.get(command);
-            if (!commandFile) return message.channel.send("**Error!** Unknown command!")
-            commandFile.run(bot, message, args);
+                return message.channel.send("**Error!** You are banned from using this bot!");
+    
+            } else {
+                
+                // Run the command file
+                let commandFile = bot.commands.get(command);
+                if (!commandFile) return message.channel.send("**Error!** Unknown command!")
+                commandFile.run(bot, message, args, members);
+    
+            }
 
-        }
+        })
+
     }
     
     // Check if the bot is mentioned, and send a help message
@@ -227,10 +323,10 @@ bot.on('error', error =>{
     console.log(error);
     bot.fetchUser("365452203982323712").then(user => {
 
-        user.send("**Error!** Bot error! \n" + error ).catch(err => {if (err) console.log(err);});
+        user.send("**Error!** Check the console!").catch(err => {if (err) console.log(err);});
 
     })
 
 });
 
-bot.login(botconfig.token1);
+bot.login(botconfig.token2);

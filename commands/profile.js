@@ -1,72 +1,56 @@
-const members = require('./../members.json');
 const fs = require('fs');
 const botconfig = require('../botconfig.json');
 const Discord = require('discord.js');
 
-module.exports.run = async(bot, message, args) => {
+module.exports.run = async(bot, message, args, members) => {
 
     if (!args[0]) {
 
-        let nxtLvl = members[message.author.id].level * botconfig.level;
+        await members.findOne({where: {id: message.author.id}}).then( async(member) => {
 
-        const embed = new Discord.RichEmbed()
-        .setTitle(message.author.username + "'s Profile")
-        .setThumbnail(message.author.displayAvatarURL)
-        .setColor(getRandomColor())
-        .addField("Level", members[message.author.id].level)
-        .addField("Next level progress", members[message.author.id].exp + "/" + nxtLvl + " Exp")
-        .addField("Reputation", members[message.author.id].reputation)
-        .addField("Credits", members[message.author.id].credits);
+            let nxtLvl = member.dataValues.level * botconfig.level;
 
-        message.channel.send(embed);
+            const embed = new Discord.RichEmbed()
+            .setTitle(message.author.username + "'s Profile")
+            .setThumbnail(message.author.displayAvatarURL)
+            .setColor(getRandomColor())
+            .addField("Level", member.dataValues.level)
+            .addField("Next level progress", member.dataValues.exp + "/" + nxtLvl + " Exp")
+            .addField("Reputation", member.dataValues.reputation)
+            .addField("Credits", member.dataValues.credits);
+    
+            message.channel.send(embed);
+
+        });
+
+
 
     } else if (args[0]) {
 
         if (!message.mentions.members.first()) return message.channel.send("**Error!** I could not find this user!");
         if (message.mentions.members.first().user.bot) return message.channel.send("**Error!** Target user is a bot!");
 
-        let nxtLvl = members[message.mentions.members.first().user.id].level * botconfig.level;
+        await members.findOne({where: {id : message.mentions.members.first().user.id}}).then( async(member) => {
 
-        const embed = new Discord.RichEmbed()
-        .setTitle(message.mentions.members.first().user.username + "'s Profile")
-        .setThumbnail(message.mentions.members.first().user.displayAvatarURL)
-        .setColor(getRandomColor())
-        .addField("Level", members[message.mentions.members.first().user.id].level)
-        .addField("Next level progress", members[message.mentions.members.first().user.id].exp + "/" + nxtLvl + " Exp")
-        .addField("Reputation", members[message.mentions.members.first().user.id].reputation)
-        .addField("Credits", members[message.mentions.members.first().user.id].credits);
-
-        message.channel.send(embed);
-
-    } else {
-
-        if (!members[args[0]]) return message.channel.send("**Error!** I could not find this user!");
-
-        bot.fetchUser(args[0]).then(user => {
-
-            if (user.bot) return message.channel.send("**Error!** Bot's do not have a profile!");
-
-            let nxtLvl = members[user.id].level * botconfig.level;
+            let nxtLvl = member.dataValues.level * botconfig.level;
 
             const embed = new Discord.RichEmbed()
-            .setTitle(user.username + "'s Profile")
-            .setThumbnail(user.displayAvatarURL)
+            .setTitle(message.mentions.members.first().user.username + "'s Profile")
+            .setThumbnail(message.mentions.members.first().user.displayAvatarURL)
             .setColor(getRandomColor())
-            .addField("Level", members[user.id].level)
-            .addField("Next level progress", members[user.id].exp + "/" + nxtLvl)
-            .addField("Reputation", members[user.id].reputation)
-            .addField("Credits", members[user.id].credits);
-
+            .addField("Level", member.dataValues.level)
+            .addField("Next level progress", member.dataValues.exp + "/" + nxtLvl + " Exp")
+            .addField("Reputation", member.dataValues.reputation)
+            .addField("Credits", member.dataValues.credits);
+    
             message.channel.send(embed);
-
-        }).catch(err => {
-
-            if(err) console.log(err);
 
         });
 
-    }
+    } else {
 
+        // do nothing
+    }
 }
 module.exports.help = {
     name: "profile",
