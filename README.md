@@ -1,5 +1,5 @@
-# ADPREV
-The bot code for ADPREV
+# Kokoku nashi
+The bot code for Kokoku nashi
 
 
 
