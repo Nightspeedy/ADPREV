@@ -18,18 +18,20 @@ module.exports.run = async(bot, message, args) => {
         var int = parseInt(args[0]);
         int = int;
 
-        await message.channel.fetchMessages({limit: int}).then(messages => {
+        await message.channel.fetchMessages({limit: int}).then( async(messages) => {
 
-            message.channel.bulkDelete(messages);
+            await message.channel.bulkDelete(messages).then( () => {
 
-            message.channel.send(`Deleted ${int} Messages`)
-
+                message.channel.send(`Deleted ${int} Messages`);
+            }).catch(err => {
+                
+                message.channel.send("**Error!** couldn't purge messages! Do i have the correct permissions?");
+            })
         }).catch(err => {if (err) console.log(err)});
-        
     } else {
+
         return message.channel.send("**Error!** You do not have permission to execute this command!");
     }
-
 }
 module.exports.help = {
     name: "purge",
@@ -38,6 +40,8 @@ module.exports.help = {
     modCommand: true,
     botOwner: false,
     utility: false,
+    social: false,
+    games: false,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

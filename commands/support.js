@@ -7,7 +7,7 @@ module.exports.run = async(bot, message, args) => {
     let embed = new Discord.RichEmbed()
     .setTitle(bot.user.username + " Support")
     .setColor(getRandomColor())
-    .addField("Support server", "Join the support server for help -> ")
+    .addField("Support server", `Join the [support server](https://discord.gg/8dnHRvk) for help`)
     .addField("Live chat", "Get support through live-chat, Simply say the bot's name and ask your question (example: Kokoku? How do i use your commands?)")
     .addField("Further support", "If you need help some other way, contact Asuna#1000");
 
@@ -27,6 +27,8 @@ module.exports.help = {
     modCommand: false,
     botOwner: false,
     utility: true,
+    social: false,
+    games: false,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

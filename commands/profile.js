@@ -59,6 +59,8 @@ module.exports.help = {
     modCommand: false,
     botOwner: false,
     utility: false,
+    social: true,
+    games: false,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

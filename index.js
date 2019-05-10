@@ -13,7 +13,7 @@ const fs = require('fs');
 let cooldown = new Set();
 
 console.log("Starting bot...");
-console.log("Setting start time...");
+console.log("Setting startup time...");
 
 // dbase init
 console.log("Connecting to database...");
@@ -65,9 +65,9 @@ const members = sequelize.define('Members', {
 
 try {
     botconfig.date = Date.now();
-    console.log("Successfully set startup date");
+    console.log("Successfully set startup time!");
 } catch (error) {
-    console.log("Failed to set startup date");
+    console.log("Failed to set startup tim!");
 }
 
 fs.readdir("./commands/", (err, files) => {
@@ -242,7 +242,7 @@ bot.on('message', async(message) => {
 
     if (bot.user.username == "Kōkoku nashi Dev Build" && message.author.id != 365452203982323712) return;
    
-    forwarding.run(bot, message);
+    //forwarding.run(bot, message);
 
     // Check if channel type is DM.
     if (message.channel.type == "dm") return;
@@ -263,6 +263,20 @@ bot.on('message', async(message) => {
 
     // If a command is registered and the message starts with the prefix, run the command.
     if (command && message.content.startsWith(prefix)) {
+
+        //check if bot has these permissions
+        const permissions = message.channel.permissionsFor(message.guild.me)
+
+        if (!permissions.has("SEND_MESSAGES")) {
+    
+            try {
+    
+                 message.author.send("**Bot Disabled** I can't send messages without the SEND_MESSAGES permission, please grant me this permission");
+            } catch(err) {
+            }
+        }
+        if (!permissions.has("EMBED_LINKS")) return message.channel.send("**Bot Disabled** I can't send messages without the EMBED_LINKS permission, please grant me this permission.");
+        // endif
 
         // Check if a user recently used a command
         if (cooldown.has(message.author.id)) {
@@ -285,19 +299,22 @@ bot.on('message', async(message) => {
         // Check if a user is banned
         members.findOne({where: {id: message.author.id}}).then(member => {
 
-            if (member.dataValues.isBanned == true) {
+            if (!member) return;
+ 
+            if (member.dataValues.isBanned) {
 
                 return message.channel.send("**Error!** You are banned from using this bot!");
-    
             } else {
                 
                 // Run the command file
                 let commandFile = bot.commands.get(command);
                 if (!commandFile) return message.channel.send("**Error!** Unknown command!")
                 commandFile.run(bot, message, args, members);
-    
             }
+        }).catch(err => {
 
+            if (err) console.log(err);
+            return message.channel.send("**Error!** Please send a report of what you were doing when you recieved this error to Asuna#1000");
         })
 
     }

@@ -27,6 +27,9 @@ module.exports.run = async(bot, message, members) => {
         
             // set cooldown
         
+            setTimeout(() => {
+                cooldown.delete(message.author.id);
+            }, 120000);
         
             // check if user is banned, if banned, return
             if (result.dataValues.isBanned == true) return;
@@ -35,8 +38,6 @@ module.exports.run = async(bot, message, members) => {
             let randomExp = Math.floor(Math.random() * 20 + 11);
             let randomCre = Math.floor(Math.random() * 4 + 1);
         
-            let nxtLvl = result.dataValues.level * botconfig.level;
-
             let exp = result.dataValues.exp + randomExp;
             let credits = result.dataValues.credits + randomCre;
         
@@ -44,10 +45,11 @@ module.exports.run = async(bot, message, members) => {
             await members.update({exp: exp, credits: credits,}, {where: { id: message.author.id}});
         
             // if user has more EXP then needed, level them up
+            let nxtLvl = result.dataValues.level * botconfig.level;
             if (result.dataValues.exp >= nxtLvl){
         
                 let level = result.dataValues.level + 1;
-                result.dataValues.exp = 0;
+                exp = 0;
         
                 let embed = new Discord.RichEmbed()
                 .setTitle("Level up!")
@@ -59,9 +61,6 @@ module.exports.run = async(bot, message, members) => {
                 await members.update({exp: exp, level: level}, {where: { id: message.author.id}});
         
             }
-            setTimeout(() => {
-                cooldown.delete(message.author.id);
-            }, 60000);
         }
     });
 }

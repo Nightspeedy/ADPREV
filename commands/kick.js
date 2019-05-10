@@ -43,7 +43,7 @@ module.exports.run = async(bot, message, args) => {
                 }
             }).catch(err => {
 
-                message.channel.send("**Error!** I couldn't ban this user! Do i have the right permissions?");
+                message.channel.send("**Error!** I couldn't kick this user! Do i have the right permissions?");
                 console.log(err)
 
             });
@@ -69,6 +69,8 @@ module.exports.help = {
     modCommand: true,
     botOwner: false,
     utility: false,
+    social: false,
+    games: false,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

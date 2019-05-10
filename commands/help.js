@@ -15,7 +15,9 @@ module.exports.run = async(bot, message, args) => {
     let gnrl = "";
     let util = "";
     let mods = "";
-    let boto = ""
+    let boto = "";
+    let socl = "";
+    let game = "";
 
     if (!args[0]) {
 
@@ -35,14 +37,24 @@ module.exports.run = async(bot, message, args) => {
 
                 boto += " `" + getCommand.help.name + "` ";
 
+            } else if (getCommand.help.social == true) {
+
+                socl += " `" + getCommand.help.name + "` ";
+
+            } else if (getCommand.help.games == true) {
+
+                game += " `" + getCommand.help.name + "` ";                
+
             } else {
 
                 gnrl += " `" + getCommand.help.name + "` ";
             }
         }
 
-        embed.setDescription("Use " + guildSettings[message.guild.id].prefix +"help [command] for detailed command information.")
+        embed.setDescription("Use " + guildSettings[message.guild.id].prefix +"help [command] for detailed command information. \n\n **IMPORTANT!!!** \nI am having issues with my webhost, Expect a lot of downtime! \n**IMPORTANT!!!**\n")
         embed.addField("General commands", gnrl);
+        embed.addField("Game commands", game)
+        embed.addField("Social commands", socl);
         embed.addField("Utility commands", util);
         embed.addField("Mod commands", mods);
         embed.addField("Bot owner commands", boto)
@@ -67,11 +79,14 @@ module.exports.run = async(bot, message, args) => {
 
 module.exports.help = {
     name: "help",
-    description: "The help command.",
+    description: "The general help command.",
     args: "{Command}",
     modCommand: false,
     botOwner: false,
     utility: true,
+    social: false,
+    games: false,
+    games: false,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

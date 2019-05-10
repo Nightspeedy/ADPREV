@@ -5,14 +5,14 @@ const Discord = require('discord.js');
 module.exports.run = async(bot, message, args, members) => {
 
     if (!args[0]) return message.channel.send("**Error!** Please use at least 1 argument!");
-    if (isNaN(args[0])) return message.channel.send("**Error! Expected argument is not a number!");
+    if (isNaN(args[0])) return message.channel.send("**Error!** Expected argument is not a number!");
     if (args[1]) return message.channel.send("**Error!** Too many arguments. 1 expected, got " + args.length);
 
     let member = await members.findOne({where: {id: message.author.id}});
 
     let toGamble = parseInt(args[0]);
 
-    if (toGamble >= 5000) return message.channel.send("**Hold up!** To protect you from yourself, i have a gambling limit of 5000 credits per gamble!")
+    if (toGamble > 5000) return message.channel.send("**Hold up!** To protect you from yourself, i have a gambling limit of 5000 credits per gamble!")
     if (toGamble > member.dataValues.credits) return message.channel.send("**Error!** Insufficient funds!")
 
     let random1 = Math.floor(Math.random() * 100 + 1);
@@ -23,7 +23,7 @@ module.exports.run = async(bot, message, args, members) => {
     let earned = 0;
 
     let embed = new Discord.RichEmbed()
-    .setTitle("Gamble")
+    .setTitle("Slots")
     .setColor(getRandomColor())
     .addField("Your lucky numbers are", random1 + ", " + random2 + ", " + random3);
 
@@ -62,7 +62,7 @@ module.exports.run = async(bot, message, args, members) => {
 
         members.update({credits: credits}, {where: {id: message.author.id}});
         return message.channel.send(embed);
-    } else if (total >= 155 && total < 225) {
+    } else if (total >= 165 && total < 225) {
 
         earned = toGamble * 2;
         earned -= toGamble;
@@ -90,6 +90,8 @@ module.exports.help = {
     modCommand: false,
     botOwner: false,
     utility: false,
+    social: false,
+    games: true,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

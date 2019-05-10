@@ -9,12 +9,12 @@ module.exports.run = async(bot, message, args, members) => {
 
     if (!args[0]) {
 
-        message.channel.send("**Error!** Please mention a valid user, or provide a valid user ID! You can rep someone now.")
+        message.channel.send("Please mention a valid user, or provide a valid user ID! You can rep someone now.")
 
     } else if (args[0]) {
 
         // Gift by mention
-
+        if (!message.mentions.members.first()) return message.channel.send("**Error!** Please mention a valid user!")
         if (message.mentions.members.first().user.bot) return message.channel.send("**Error!** Target user is a bot!");
         if (message.author.id == message.mentions.members.first().user.id) return message.channel.send("**Error!** You cannot rep yourself!");
 
@@ -57,6 +57,8 @@ module.exports.help = {
     modCommand: false,
     botOwner: false,
     utility: false,
+    social: true,
+    games: false,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

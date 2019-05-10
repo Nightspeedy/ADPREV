@@ -5,3 +5,5 @@ guildSettings.json
 members.json
 database.sqlite
 members.json-backup.txt
+node_modules
+socialGifs

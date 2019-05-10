@@ -83,7 +83,9 @@ module.exports.help = {
     description: "Check the leaderboard, see if you're on it!",
     args: "[levels/credits/reputation]",
     modCommand: false,
-    botOwner: false
+    botOwner: false,
+    social: false,
+    games: false,
 }
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
